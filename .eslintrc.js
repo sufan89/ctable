@@ -3,13 +3,12 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es2021: true,
   },
   parser: "vue-eslint-parser",
   extends: [
     "eslint:recommended",
     "plugin:vue/vue3-recommended",
-    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:prettier/recommended",
     // eslint-config-prettier 的缩写
     "prettier",
@@ -136,7 +135,6 @@ module.exports = {
     "switch-colon-spacing": "warn",
     // 强制箭头函数的箭头前后使用一致的空格
     "arrow-spacing": "warn",
-    "no-var": "warn",
     "prefer-const": "warn",
     "prefer-rest-params": "warn",
     "no-useless-escape": "warn",
