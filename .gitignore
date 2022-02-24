@@ -3,3 +3,4 @@ node_modules
 *.local
 packge-lock.json
 .vscode
+.idea
