@@ -22,33 +22,33 @@ const tableConfig: CTable.TableConfig = {
       label: "证件号码",
       width: "200",
       prop: "accountId",
-      align: "right",
+      align: "left",
     },
     {
       label: "开通电子合同服务状态",
       width: "180",
       prop: "openStatus",
-      align: "left",
+      align: "center",
     },
     {
       label: "税务编码",
       prop: "taxIdentifyNo",
-      align: "right",
+      align: "left",
     },
     {
       label: "开通时间",
       prop: "openTime",
-      align: "left",
+      align: "center",
     },
     {
       label: "创建时间",
       prop: "createdTime",
-      align: "center",
+      align: "right",
     },
     {
       label: "更新时间",
       prop: "updatedTime",
-      align: "center",
+      align: "right",
     },
   ],
 };
@@ -86,8 +86,8 @@ onMounted(() => {
     tableData.push(item);
   }
   myTable = new CTable("myTable", tableConfig);
-  myTable.setTableData(tableData);
-})
+  myTable.setTableData([]);
+});
 </script>
 <style scoped>
 #myTable {

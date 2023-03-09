@@ -3,9 +3,34 @@ declare namespace CTable {
    * 表格配置
    * */
   type TableConfig = {
+    /*
+     * 表格列配置信息
+     * */
     Columns: Array<ColumnConfig>;
+    /*
+     * 是否显示CheckBox列
+     * */
     showCheckBox?: Boolean;
+    /*
+     * 是否显示序号列
+     * */
     showIndex?: Boolean;
+    /*
+     * 表头行样式
+     * */
+    headRowStyle?: Function;
+    /*
+     * 表头单元格样式
+     * */
+    headCellStyle?: Function;
+    /*
+     * 单元格样式
+     * */
+    rowCellStyle?: Function;
+    /*
+     * 字体类型
+     * */
+    baseFont?: baseFont;
   };
   /*
    * 表格列配置
@@ -24,11 +49,9 @@ declare namespace CTable {
      * */
     width?: string | number;
     /*
-     * 是否固定
-     * 默认是FALSE，不固定，TRUE为左固定
-     * 可以使用left和right
+     * 列固定方式
      * */
-    fixed?: true | false | "left" | "right";
+    fixed?: "left" | "right";
     /*
      * 最小宽度
      * */
@@ -36,6 +59,22 @@ declare namespace CTable {
     /*
      * 内容对齐方式，默认是左对齐
      * */
-    align?: "center" | "left" | "right";
+    align?: "start" | "end" | "center" | "left" | "right";
+    /*
+     * 多级表头
+     * */
+    children?: Array<ColumnConfig>;
+    /*
+     * 格式化函数
+     * */
+    formatter?: Function;
   };
+  interface ITable {
+    parentElement: HTMLElement | null;
+    tableElement: HTMLCanvasElement | null;
+    ctx: CanvasRenderingContext2D | null;
+    canvasSize: [number, number];
+    tableHeader: CTable.IHeadRow | undefined;
+    tableStyle: CTable.ITableStyle;
+  }
 }

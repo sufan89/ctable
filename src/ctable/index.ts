@@ -1,1 +1,1 @@
-export {default as CTable} from "./src/ctable"
+export { default as CTable } from "./src/ctable";
