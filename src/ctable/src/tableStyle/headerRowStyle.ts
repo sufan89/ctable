@@ -24,9 +24,9 @@ class HeaderRowStyleClass implements CTable.IHeaderRowStyle {
      * 默认字体信息
      * */
     if (tableStyle) {
-      this.rowFont = tableStyle.baseFont;
+      this.rowFont = { ...tableStyle.baseFont };
     } else if (tableConfig.baseFont) {
-      this.rowFont = tableConfig.baseFont;
+      this.rowFont = { ...tableConfig.baseFont };
     } else {
       this.rowFont = {
         textBaseline: "middle",

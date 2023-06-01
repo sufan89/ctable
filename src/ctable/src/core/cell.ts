@@ -6,15 +6,11 @@ class CellClass implements CTable.ICell {
   public cellPosition: CTable.position;
   public cellStyle: CTable.ICellStyle;
   public cellKey: string;
-  public cellHeight: number;
-  public cellWidth: number;
-  public contentHeight: number;
-  public contentWidth: number;
+  public cellSize: CTable.size = { width: 0, height: 0 };
+  public contentSize: CTable.size = { width: 0, height: 0 };
   public cellType: "text";
   public children: Array<CTable.ICell>;
   public realVal: string;
-  public realHeight: number;
-  public realWidth: number;
   public columnInfo: CTable.ColumnConfig;
   /**
    * canvas上下文
@@ -30,22 +26,18 @@ class CellClass implements CTable.ICell {
     this.cellKey = Guid.create().toString();
     this.ctx = context;
     this.cellPosition = { x: 0, y: 0 };
-    this.cellHeight = 0;
-    this.cellWidth = 0;
-    this.contentWidth = 0;
-    this.contentHeight = 0;
     this.cellType = "text";
     this.children = new Array<CTable.ICell>();
     this.realVal = "";
-    this.realWidth = 0;
-    this.realHeight = 0;
     this.columnInfo = colConfig;
   }
   /*
    * 渲染一个单元格
    * */
   public renderCell(context: CTable.ITable, cellValue: string) {
+    // 绘制单元格
     this.renderCellBody();
+    // 绘制内容
     if (this.cellType === "text") {
       this.renderTextCell(context, cellValue);
     }
@@ -59,22 +51,22 @@ class CellClass implements CTable.ICell {
       this.ctx.textAlign = this.cellStyle.cellFont.textAlign;
       this.ctx.textBaseline = this.cellStyle.cellFont.textBaseline;
       const textMetrics = this.ctx.measureText(val);
-      this.contentWidth = textMetrics.width;
-      this.contentHeight = translatePxToNumber(
-        this.cellStyle.cellFont.fontSize,
-        "px"
-      );
+      this.contentSize = {
+        width: textMetrics.width,
+        height: translatePxToNumber(this.cellStyle.cellFont.fontSize, "px"),
+      };
     }
     // 当前单元格宽带为内容宽度+内边距宽度
-    this.cellWidth =
-      this.contentWidth +
-      this.cellStyle.cellPadding.right +
-      this.cellStyle.cellPadding.left;
-    // 当前单元格高度为内容高度+内边距高度
-    this.cellHeight =
-      this.contentHeight +
-      this.cellStyle.cellPadding.top +
-      this.cellStyle.cellPadding.bottom;
+    this.cellSize = {
+      width:
+        this.contentSize.width +
+        this.cellStyle.cellPadding.right +
+        this.cellStyle.cellPadding.left,
+      height:
+        this.contentSize.height +
+        this.cellStyle.cellPadding.top +
+        this.cellStyle.cellPadding.bottom,
+    };
   }
   /*
    * 渲染文本单元格
@@ -90,7 +82,7 @@ class CellClass implements CTable.ICell {
         val,
         this.cellPosition.x + contentPosition.x,
         this.cellPosition.y + contentPosition.y,
-        this.realWidth
+        this.cellSize.width
       );
     }
   }
@@ -104,8 +96,8 @@ class CellClass implements CTable.ICell {
       this.ctx.fillRect(
         this.cellPosition.x - this.cellStyle.cellBorder.width,
         this.cellPosition.y - this.cellStyle.cellBorder.width,
-        this.realWidth - this.cellStyle.cellBorder.width,
-        this.realHeight - this.cellStyle.cellBorder.width
+        this.cellSize.width - this.cellStyle.cellBorder.width,
+        this.cellSize.height - this.cellStyle.cellBorder.width
       );
       // 绘制边框
       this.ctx.fillStyle = this.cellStyle.cellBorder.color;
@@ -113,8 +105,8 @@ class CellClass implements CTable.ICell {
       this.ctx.strokeRect(
         this.cellPosition.x,
         this.cellPosition.y,
-        this.realWidth,
-        this.realHeight
+        this.cellSize.width,
+        this.cellSize.height
       );
     }
   }
@@ -124,7 +116,7 @@ class CellClass implements CTable.ICell {
   getContentPosition(): { x: number; y: number } {
     const position = { x: 0, y: 0 };
     // 对齐方式，默认为左对齐
-    position.y = this.realHeight - this.contentHeight;
+    position.y = this.cellSize.height - this.contentSize.height;
     switch (this.cellStyle.cellFont.textAlign) {
       case "left":
       case "start":
@@ -132,13 +124,25 @@ class CellClass implements CTable.ICell {
         break;
       case "right":
       case "end":
-        position.x = this.realWidth - this.cellStyle.cellPadding.right;
+        position.x = this.cellSize.width - this.cellStyle.cellPadding.right;
         break;
       case "center":
-        position.x = this.realWidth / 2;
+        position.x = this.cellSize.width / 2;
         break;
     }
     return position;
+  }
+  /*
+   * 获取当前单元格大小
+   * 如果有子，则计算子的大小
+   * 没有子，则返回当前大小
+   * 用于计算行高
+   * */
+  public getCellSize(): CTable.size {
+    const size = { ...this.cellSize };
+    if (this.children && this.children.length > 0) {
+    }
+    return size;
   }
 }
 export default CellClass;

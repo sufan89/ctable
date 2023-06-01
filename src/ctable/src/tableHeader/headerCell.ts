@@ -26,15 +26,16 @@ class headerCell extends CellClass {
    * 计算单元格大小
    * */
   public calcCellSize() {
-    if (this.cellType === "text") {
-      super.calcCellSize(this.columnInfo.label);
-    } else {
-      super.calcCellSize("");
+    switch (this.cellType) {
+      case "text":
+        super.calcCellSize(this.columnInfo.label);
+        break;
+      default:
+        super.calcCellSize("");
+        break;
     }
     // 计算当前单元格大小
-    const { width, height } = this.getRealCellSize();
-    this.realWidth = width;
-    this.realHeight = height;
+    this.cellSize = this.getRealCellSize();
   }
   /*
    * 根据当前的列配置信息，计算当前单元格实际的宽度
@@ -44,22 +45,29 @@ class headerCell extends CellClass {
    * */
   getRealCellSize(): { width: number; height: number } {
     let width = 0;
-    let height = this.cellHeight;
+    let height = this.cellSize.height;
+    let childMaxHeight = 0;
     // 有子，先计算子的宽度
     if (this.children && this.children.length > 0) {
       this.children.forEach((c) => {
         c.calcCellSize();
-        width = width + c.realWidth;
-        height = height + c.realHeight;
+        // 宽度取所有子宽度之和
+        width = width + c.cellSize.width;
+        // 高度应该取所有子的最大高度与当前文本高度之和，而不是取所有子的高度之和
+        if (childMaxHeight < c.cellSize.height) {
+          childMaxHeight = c.cellSize.height;
+        }
       });
+      height = childMaxHeight + this.cellSize.height;
     } else {
       // 没有子，但是列配置了宽度，则取列宽度
       if (this.columnInfo.width) {
         width =
-          translatePxToNumber(this.columnInfo.width, "px") || this.cellWidth;
+          translatePxToNumber(this.columnInfo.width, "px") ||
+          this.cellSize.width;
       } else {
         // 没有配置列宽度，取当前内容的宽度
-        width = this.cellWidth;
+        width = this.cellSize.width;
       }
     }
     return {

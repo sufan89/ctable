@@ -36,6 +36,28 @@ const tableConfig: CTable.TableConfig = {
       align: "left",
     },
     {
+      label: "详细信息",
+      prop: "detail",
+      align: "center",
+      children: [
+        {
+          label: "开通时间",
+          prop: "openTime",
+          align: "center",
+        },
+        {
+          label: "创建时间",
+          prop: "createdTime",
+          align: "right",
+        },
+        {
+          label: "更新时间",
+          prop: "updatedTime",
+          align: "right",
+        },
+      ],
+    },
+    {
       label: "开通时间",
       prop: "openTime",
       align: "center",

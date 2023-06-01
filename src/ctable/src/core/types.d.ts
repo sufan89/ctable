@@ -9,39 +9,33 @@ declare namespace CTable {
     cellPosition: CTable.position;
     cellStyle: CTable.ICellStyle;
     cellKey: string;
-    // 单元格高度
-    cellHeight: number;
-    // 单元格宽带
-    cellWidth: number;
-    // 单元格内容高度
-    contentHeight: number;
-    // 单元格内容宽度
-    contentWidth: number;
+    // 单元格大小
+    cellSize: CTable.size;
+    // 内容大小
+    contentSize: CTable.size;
     // 子单元格
     children?: Array<CTable.ICell>;
     // 单元格类型
     cellType: "text" | "image" | "tag" | "custom" | "checkbox";
     // 实际内容
     realVal: string;
-    // 实际宽度
-    realWidth: number;
-    // 实际高度
-    realHeight: number;
     // 绘制单元格
     renderCell: Function;
     // 计算单元格大小
     calcCellSize: Function;
     // 列配置信息
     columnInfo: CTable.ColumnConfig;
+    // 获取单元格大小，包括子所有子单元格大小
+    getCellSize: Function;
   }
   /*
    * 位置
    * */
-  type position = {
+  export type position = {
     x: number;
     y: number;
   };
-  type size = {
+  export type size = {
     width: number;
     height: number;
   };
@@ -56,9 +50,9 @@ declare namespace CTable {
   /*
    * 表头行
    * */
-  interface IHeadRow extends IRow {}
+  export interface IHeadRow extends IRow {}
   /*
    * 表体行
    * */
-  interface ITableRow extends IRow {}
+  export interface ITableRow extends IRow {}
 }

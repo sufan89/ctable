@@ -1,5 +1,4 @@
 import headerCell from "./headerCell";
-import CellStyleClass from "../tableStyle/cellStyle";
 
 class tableHeader implements CTable.IHeadRow {
   /*
@@ -77,7 +76,6 @@ class tableHeader implements CTable.IHeadRow {
    * 表头渲染
    * */
   public renderRow(context: CTable.ITable) {
-    console.log(context, "context");
     // 计算行中每个单元格的位置
     this.calcRowCellPosition(
       {
@@ -109,11 +107,15 @@ class tableHeader implements CTable.IHeadRow {
       this.rowCells.forEach((cell) => {
         cell.calcCellSize();
         // 设置当前行高度
-        if (this.rowHeight < cell.realHeight) {
-          this.rowHeight = cell.realHeight;
+        if (this.rowHeight < cell.cellSize.height) {
+          this.rowHeight = cell.cellSize.height;
         }
       });
     }
+    // 将单元格设置成行高
+    this.rowCells.forEach((cell) => {
+      cell.cellSize.height = this.rowHeight;
+    });
   }
   /*
    * 计算行所有单元格位置
@@ -128,18 +130,18 @@ class tableHeader implements CTable.IHeadRow {
         // 为固定列
         if (cell.columnInfo.fixed && cell.columnInfo.fixed === "right") {
           cell.cellPosition = { x: width, y: y };
-          width = width - cell.realWidth;
+          width = width - cell.cellSize.height;
         } else {
           cell.cellPosition = { x: x, y: y };
-          x = x + cell.realWidth;
+          x = x + cell.cellSize.height;
         }
         if (cell.children && cell.children.length > 0) {
           this.calcRowCellPosition(
             {
               x: cell.cellPosition.x,
-              y: cell.realHeight,
-              width: cell.realWidth,
-              height: cell.realHeight,
+              y: cell.cellSize.height,
+              width: cell.cellSize.width,
+              height: cell.cellSize.height,
             },
             cell.children
           );

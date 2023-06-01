@@ -59,21 +59,9 @@ class tableClass implements CTable.ITable {
     this.ctx = this.tableElement.getContext("2d");
     this.canvasSize = [0, 0];
     this.viewSize = [0, 0];
-    this.changeCanvasSize();
     // 表格样式
-    this.tableStyle = new tableStyle(tableConfig);
-    /*
-     * 获取表头信息
-     * */
-    if (this.ctx) {
-      this.tableHeader = new headerRow(
-        this.ctx,
-        tableConfig.Columns,
-        this.tableStyle.headerRowStyle
-      );
-    } else {
-      this.tableHeader = undefined;
-    }
+    this.tableStyle = new tableStyle(this.tableConfig);
+    this.changeCanvasSize();
     // 初始化
     this.init();
   }
@@ -81,12 +69,23 @@ class tableClass implements CTable.ITable {
    * 根据配置进行初始化
    */
   private init() {
+    /*
+     * 获取表头信息
+     * */
+    if (this.ctx) {
+      this.tableHeader = new headerRow(
+        this.ctx,
+        this.tableConfig.Columns,
+        this.tableStyle.headerRowStyle
+      );
+    } else {
+      this.tableHeader = undefined;
+    }
     if (this.tableHeader) {
       this.tableHeader.renderRow(this);
     }
     console.log(this.tableStyle, this.tableHeader, "this.tableStyle");
   }
-
   /*
    * 根据父节点内容，改变画布大小
    * */
@@ -108,23 +107,6 @@ class tableClass implements CTable.ITable {
    * */
   public setTableData(tableData: Array<object>) {
     console.log(tableData);
-  }
-
-  /*
-   * 绘制表头
-   * */
-  drawTableHeader() {
-    // if (this.tableHeaders && this.tableHeaders.length > 0) {
-    //   this.tableHeaders.forEach((col, index) => {
-    //     if (this.ctx !== null) {
-    //       this.ctx.font = "18px Microsoft YaHei";
-    //       this.ctx.textAlign = "center";
-    //       this.ctx.textBaseline = "middle";
-    //       const cellTextWidth = this.ctx.measureText(col.label).width;
-    //       this.ctx.fillText(col.label, 0 + index * 200, 10, 100 + index * 100);
-    //     }
-    //   });
-    // }
   }
 }
 
