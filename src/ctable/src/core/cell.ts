@@ -12,6 +12,7 @@ class CellClass implements CTable.ICell {
   public children: Array<CTable.ICell>;
   public realVal: string;
   public columnInfo: CTable.ColumnConfig;
+  public rowHeight: number;
   /**
    * canvas上下文
    */
@@ -30,6 +31,7 @@ class CellClass implements CTable.ICell {
     this.children = new Array<CTable.ICell>();
     this.realVal = "";
     this.columnInfo = colConfig;
+    this.rowHeight = 0;
   }
   /*
    * 渲染一个单元格
@@ -92,12 +94,13 @@ class CellClass implements CTable.ICell {
   renderCellBody() {
     if (this.ctx) {
       //绘制矩形
+      const cellHeight = this.getCellHeight();
       this.ctx.fillStyle = this.cellStyle.cellFill.color;
       this.ctx.fillRect(
         this.cellPosition.x - this.cellStyle.cellBorder.width,
         this.cellPosition.y - this.cellStyle.cellBorder.width,
         this.cellSize.width - this.cellStyle.cellBorder.width,
-        this.cellSize.height - this.cellStyle.cellBorder.width
+        cellHeight - this.cellStyle.cellBorder.width
       );
       // 绘制边框
       this.ctx.fillStyle = this.cellStyle.cellBorder.color;
@@ -106,17 +109,18 @@ class CellClass implements CTable.ICell {
         this.cellPosition.x,
         this.cellPosition.y,
         this.cellSize.width,
-        this.cellSize.height
+        cellHeight
       );
     }
   }
   /*
    * 计算当前内容绘制的位置
    * */
-  getContentPosition(): { x: number; y: number } {
+  getContentPosition(): CTable.position {
     const position = { x: 0, y: 0 };
+    const cellHeight = this.getCellHeight();
+    position.y = cellHeight - (cellHeight - this.contentSize.height) / 2;
     // 对齐方式，默认为左对齐
-    position.y = this.cellSize.height - this.contentSize.height;
     switch (this.cellStyle.cellFont.textAlign) {
       case "left":
       case "start":
@@ -129,20 +133,58 @@ class CellClass implements CTable.ICell {
       case "center":
         position.x = this.cellSize.width / 2;
         break;
+      default:
+        break;
     }
     return position;
   }
   /*
    * 获取当前单元格大小
    * 如果有子，则计算子的大小
+   * 宽度取所有子之和，高度，取当前子最大与当前之和
    * 没有子，则返回当前大小
    * 用于计算行高
+   * @return CTable.size
    * */
   public getCellSize(): CTable.size {
     const size = { ...this.cellSize };
+    let maxHeight = 0;
     if (this.children && this.children.length > 0) {
+      this.children.forEach((cell) => {
+        if (cell.children && cell.children.length > 0) {
+          const childSize = cell.getCellSize();
+          size.width = childSize.width + size.width;
+          if (childSize.height > maxHeight) {
+            maxHeight = childSize.height;
+          }
+        } else {
+          size.width = cell.cellSize.width + size.width;
+          maxHeight =
+            cell.cellSize.height > maxHeight ? cell.cellSize.height : maxHeight;
+        }
+      });
     }
+    size.height = maxHeight + size.height;
     return size;
+  }
+  /*
+   * 设置行高
+   * */
+  public setRowHeight(height: number = 0) {
+    this.rowHeight = height;
+  }
+  /*
+   * 获取当前单元格高度
+   * */
+  getCellHeight(): number {
+    // 有子，获取所有子的最大高度
+    if (this.children && this.children.length > 0) {
+      return this.cellSize.height;
+    }
+    // 没有子，则取行高与当前单元格最大
+    return this.cellSize.height < this.rowHeight
+      ? this.rowHeight
+      : this.cellSize.height;
   }
 }
 export default CellClass;

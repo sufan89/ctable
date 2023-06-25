@@ -27,6 +27,10 @@ declare namespace CTable {
     columnInfo: CTable.ColumnConfig;
     // 获取单元格大小，包括子所有子单元格大小
     getCellSize: Function;
+    // 行高
+    rowHeight: number;
+    // 设置行高
+    setRowHeight: Function;
   }
   /*
    * 位置

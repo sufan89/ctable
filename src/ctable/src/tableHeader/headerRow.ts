@@ -107,14 +107,15 @@ class tableHeader implements CTable.IHeadRow {
       this.rowCells.forEach((cell) => {
         cell.calcCellSize();
         // 设置当前行高度
-        if (this.rowHeight < cell.cellSize.height) {
-          this.rowHeight = cell.cellSize.height;
+        const cellSize = cell.getCellSize();
+        if (this.rowHeight < cellSize.height) {
+          this.rowHeight = cellSize.height;
         }
       });
     }
     // 将单元格设置成行高
     this.rowCells.forEach((cell) => {
-      cell.cellSize.height = this.rowHeight;
+      cell.setRowHeight(this.rowHeight);
     });
   }
   /*
@@ -133,7 +134,7 @@ class tableHeader implements CTable.IHeadRow {
           width = width - cell.cellSize.height;
         } else {
           cell.cellPosition = { x: x, y: y };
-          x = x + cell.cellSize.height;
+          x = x + cell.cellSize.width;
         }
         if (cell.children && cell.children.length > 0) {
           this.calcRowCellPosition(

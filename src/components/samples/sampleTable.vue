@@ -72,6 +72,26 @@ const tableConfig: CTable.TableConfig = {
       prop: "updatedTime",
       align: "right",
     },
+    {
+      label: "更新时间",
+      prop: "updatedTime",
+      align: "right",
+    },
+    {
+      label: "更新时间",
+      prop: "updatedTime",
+      align: "right",
+    },
+    {
+      label: "更新时间",
+      prop: "updatedTime",
+      align: "right",
+    },
+    {
+      label: "更新时间",
+      prop: "updatedTime",
+      align: "right",
+    },
   ],
 };
 const tableData: Array<object> = [];

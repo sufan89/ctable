@@ -45,20 +45,14 @@ class headerCell extends CellClass {
    * */
   getRealCellSize(): { width: number; height: number } {
     let width = 0;
-    let height = this.cellSize.height;
-    let childMaxHeight = 0;
+    const height = this.cellSize.height;
     // 有子，先计算子的宽度
     if (this.children && this.children.length > 0) {
       this.children.forEach((c) => {
         c.calcCellSize();
         // 宽度取所有子宽度之和
         width = width + c.cellSize.width;
-        // 高度应该取所有子的最大高度与当前文本高度之和，而不是取所有子的高度之和
-        if (childMaxHeight < c.cellSize.height) {
-          childMaxHeight = c.cellSize.height;
-        }
       });
-      height = childMaxHeight + this.cellSize.height;
     } else {
       // 没有子，但是列配置了宽度，则取列宽度
       if (this.columnInfo.width) {

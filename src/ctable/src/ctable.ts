@@ -84,7 +84,7 @@ class tableClass implements CTable.ITable {
     if (this.tableHeader) {
       this.tableHeader.renderRow(this);
     }
-    console.log(this.tableStyle, this.tableHeader, "this.tableStyle");
+    console.log(this.tableHeader?.rowCells, "this.tableStyle");
   }
   /*
    * 根据父节点内容，改变画布大小
