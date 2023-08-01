@@ -8,7 +8,6 @@ class tableRowStyle implements CTable.ITableRowStyle {
   rowFill: CTable.fillStyle;
   rowFont: CTable.baseFont;
   rowPadding: CTable.padding;
-  rowType: "tableRow";
   /*
    * 当前表格配置信息
    * */
@@ -32,7 +31,6 @@ class tableRowStyle implements CTable.ITableRowStyle {
       right: 10,
       left: 10,
     };
-    this.rowType = "tableRow";
   }
   /*
    * 获取表格渲染行样式

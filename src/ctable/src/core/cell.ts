@@ -1,5 +1,4 @@
 import { Guid } from "guid-typescript";
-import { translatePxToNumber } from "@/ctable/src/tools";
 import CellStyleClass from "@/ctable/src/tableStyle/cellStyle";
 
 class CellClass implements CTable.ICell {
@@ -8,7 +7,7 @@ class CellClass implements CTable.ICell {
   public cellKey: string;
   public cellSize: CTable.size = { width: 0, height: 0 };
   public contentSize: CTable.size = { width: 0, height: 0 };
-  public cellType: "text";
+  public cellType: CTable.cellType;
   public children: Array<CTable.ICell>;
   public realVal: string;
   public columnInfo: CTable.ColumnConfig;
@@ -16,7 +15,7 @@ class CellClass implements CTable.ICell {
   /**
    * canvas上下文
    */
-  private ctx: CanvasRenderingContext2D | null;
+  ctx: CanvasRenderingContext2D | null;
 
   constructor(
     s: CTable.IRowStyle,
@@ -27,7 +26,7 @@ class CellClass implements CTable.ICell {
     this.cellKey = Guid.create().toString();
     this.ctx = context;
     this.cellPosition = { x: 0, y: 0 };
-    this.cellType = "text";
+    this.cellType = colConfig.cellType || "text";
     this.children = new Array<CTable.ICell>();
     this.realVal = "";
     this.columnInfo = colConfig;
@@ -36,58 +35,16 @@ class CellClass implements CTable.ICell {
   /*
    * 渲染一个单元格
    * */
-  public renderCell(context: CTable.ITable, cellValue: string) {
+  // eslint-disable-next-line no-unused-vars
+  public renderCell(val: CTable.cellValueType) {
     // 绘制单元格
     this.renderCellBody();
-    // 绘制内容
-    if (this.cellType === "text") {
-      this.renderTextCell(context, cellValue);
-    }
   }
   /*
-   * 根据单元格内容，丈量单元格的大小
+   * 计算单元格大小
    * */
-  public calcCellSize(val: string) {
-    if (this.ctx) {
-      this.ctx.font = this.cellStyle.getFont();
-      this.ctx.textAlign = this.cellStyle.cellFont.textAlign;
-      this.ctx.textBaseline = this.cellStyle.cellFont.textBaseline;
-      const textMetrics = this.ctx.measureText(val);
-      this.contentSize = {
-        width: textMetrics.width,
-        height: translatePxToNumber(this.cellStyle.cellFont.fontSize, "px"),
-      };
-    }
-    // 当前单元格宽带为内容宽度+内边距宽度
-    this.cellSize = {
-      width:
-        this.contentSize.width +
-        this.cellStyle.cellPadding.right +
-        this.cellStyle.cellPadding.left,
-      height:
-        this.contentSize.height +
-        this.cellStyle.cellPadding.top +
-        this.cellStyle.cellPadding.bottom,
-    };
-  }
-  /*
-   * 渲染文本单元格
-   * */
-  renderTextCell(context: CTable.ITable, val: string) {
-    if (this.ctx) {
-      this.ctx.font = this.cellStyle.getFont();
-      this.ctx.textAlign = this.cellStyle.cellFont.textAlign;
-      this.ctx.textBaseline = this.cellStyle.cellFont.textBaseline;
-      this.ctx.fillStyle = this.cellStyle.cellFont.fontColor;
-      const contentPosition = this.getContentPosition();
-      this.ctx.fillText(
-        val,
-        this.cellPosition.x + contentPosition.x,
-        this.cellPosition.y + contentPosition.y,
-        this.cellSize.width
-      );
-    }
-  }
+  // eslint-disable-next-line no-unused-vars
+  calcCellSize(val: CTable.cellValueType) {}
   /*
    * 渲染一个单元格块
    * */
@@ -95,19 +52,23 @@ class CellClass implements CTable.ICell {
     if (this.ctx) {
       //绘制矩形
       const cellHeight = this.getCellHeight();
+      if (this.cellStyle.cellBorder.width !== 0) {
+        // 绘制边框
+        const cellBorder: CTable.border = this.cellStyle.cellBorder;
+        this.ctx.strokeStyle = cellBorder.color;
+        this.ctx.lineWidth = cellBorder.width;
+        this.ctx.lineJoin = "bevel";
+        this.ctx.strokeRect(
+          this.cellPosition.x + cellBorder.width,
+          this.cellPosition.y + cellBorder.width,
+          this.cellSize.width,
+          cellHeight
+        );
+      }
       this.ctx.fillStyle = this.cellStyle.cellFill.color;
       this.ctx.fillRect(
-        this.cellPosition.x - this.cellStyle.cellBorder.width,
-        this.cellPosition.y - this.cellStyle.cellBorder.width,
-        this.cellSize.width - this.cellStyle.cellBorder.width,
-        cellHeight - this.cellStyle.cellBorder.width
-      );
-      // 绘制边框
-      this.ctx.fillStyle = this.cellStyle.cellBorder.color;
-      this.ctx.lineWidth = this.cellStyle.cellBorder.width;
-      this.ctx.strokeRect(
-        this.cellPosition.x,
-        this.cellPosition.y,
+        this.cellPosition.x + this.cellStyle.cellBorder.width,
+        this.cellPosition.y + this.cellStyle.cellBorder.width,
         this.cellSize.width,
         cellHeight
       );

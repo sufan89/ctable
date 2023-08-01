@@ -10,11 +10,11 @@ declare namespace CTable {
     /*
      * 是否显示CheckBox列
      * */
-    showCheckBox?: Boolean;
+    showCheckBox?: boolean;
     /*
      * 是否显示序号列
      * */
-    showIndex?: Boolean;
+    showIndex?: boolean;
     /*
      * 表头行样式
      * */
@@ -31,6 +31,10 @@ declare namespace CTable {
      * 字体类型
      * */
     baseFont?: baseFont;
+    /*
+     * 显示边框
+     * */
+    showBorder?: boolean;
   };
   /*
    * 表格列配置
@@ -68,6 +72,21 @@ declare namespace CTable {
      * 格式化函数
      * */
     formatter?: Function;
+    /*
+     * 是否排序
+     * */
+    sortable?: true | "custom" | false;
+    /*
+     * 单元格类型
+     * */
+    cellType?: CTable.cellType;
+    /*
+     * 是否显示tooltip
+     * 如果是TRUE，则进行截断，鼠标移入显示tooltip
+     * 如果是false,则进行换行处理
+     * 默认是false
+     * */
+    showToolTip?: true | false;
   };
   interface ITable {
     parentElement: HTMLElement | null;

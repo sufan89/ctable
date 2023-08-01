@@ -1,4 +1,10 @@
-import headerCell from "./headerCell";
+import textCell from "../core/textCell";
+import checkBoxCell from "../core/checkBoxCell";
+import imgCell from "../core/imgCell";
+import buttonCell from "../core/buttonCell";
+import customCell from "../core/customCell";
+import ICell = CTable.ICell;
+import { translatePxToNumber } from "../tools";
 
 class tableHeader implements CTable.IHeadRow {
   /*
@@ -37,7 +43,7 @@ class tableHeader implements CTable.IHeadRow {
     this.headStyleInfo = headStyle;
     // 初始化表头信息
     this.initHeader();
-    // 计算行单元格大小
+    // 计算行大小
     this.calcRowSize();
   }
   /*
@@ -52,7 +58,20 @@ class tableHeader implements CTable.IHeadRow {
    * 获取表格行单元格
    * */
   getHeadCell(col: CTable.ColumnConfig): CTable.ICell {
-    return new headerCell(this.headStyleInfo, this.ctx, col);
+    switch (col.cellType) {
+      case "text":
+        return new textCell(this.headStyleInfo, this.ctx, col);
+      case "checkbox":
+        return new checkBoxCell(this.headStyleInfo, this.ctx, col);
+      case "img":
+        return new imgCell(this.headStyleInfo, this.ctx, col);
+      case "button":
+        return new buttonCell(this.headStyleInfo, this.ctx, col);
+      case "custom":
+        return new customCell(this.headStyleInfo, this.ctx, col);
+      default:
+        return new textCell(this.headStyleInfo, this.ctx, col);
+    }
   }
   /*
    * 生成表格单元格
@@ -67,6 +86,8 @@ class tableHeader implements CTable.IHeadRow {
         if (col.children && col.children.length > 0) {
           cell.children?.push(...this.generateHeadCells(col.children));
         }
+        // 计算单元格大小
+        cell.calcCellSize(col.label);
         cellList.push(cell);
       });
     }
@@ -88,7 +109,7 @@ class tableHeader implements CTable.IHeadRow {
     );
     if (this.rowCells && this.rowCells.length > 0) {
       this.rowCells.forEach((cell) => {
-        cell.renderCell(context);
+        this.renderHeaderCell(cell);
       });
     }
   }
@@ -105,7 +126,6 @@ class tableHeader implements CTable.IHeadRow {
     this.rowHeight = 0;
     if (this.rowCells && this.rowCells.length > 0) {
       this.rowCells.forEach((cell) => {
-        cell.calcCellSize();
         // 设置当前行高度
         const cellSize = cell.getCellSize();
         if (this.rowHeight < cellSize.height) {
@@ -147,6 +167,17 @@ class tableHeader implements CTable.IHeadRow {
             cell.children
           );
         }
+      });
+    }
+  }
+  /*
+   * 绘制表头单元格
+   * */
+  private renderHeaderCell(headCell: ICell) {
+    headCell.renderCell(headCell.columnInfo.label);
+    if (headCell.children && headCell.children.length > 0) {
+      headCell.children.forEach((child) => {
+        this.renderHeaderCell(child);
       });
     }
   }

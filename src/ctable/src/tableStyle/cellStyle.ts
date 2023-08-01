@@ -25,8 +25,8 @@ class CellStyleClass implements ICellStyle {
         color: "#F5F7FA",
       };
       this.cellFont = {
-        textBaseline: "middle",
-        textAlign: "left",
+        textBaseline: "alphabetic",
+        textAlign: "start",
         fontStyle: "normal",
         fontVariant: "normal",
         fontWeight: 500,
@@ -65,8 +65,6 @@ class CellStyleClass implements ICellStyle {
     if (this.cellFont.fontSize) {
       fontStr = `${fontStr} ${this.cellFont.fontSize}`;
     }
-    // if (this.cellFont.lineHeight) {
-    // }
     if (this.cellFont.fontFamily) {
       fontStr = `${fontStr} ${this.cellFont.fontFamily}`;
     }

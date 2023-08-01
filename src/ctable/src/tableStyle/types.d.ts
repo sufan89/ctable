@@ -48,12 +48,8 @@ declare namespace CTable {
     rowBorder: border;
     rowFill: fillStyle;
   }
-  interface ITableRowStyle extends IRowStyle {
-    rowType: "tableRow";
-  }
-  interface IHeaderRowStyle extends IRowStyle {
-    rowType: "headerRow";
-  }
+  interface ITableRowStyle extends IRowStyle {}
+  interface IHeaderRowStyle extends IRowStyle {}
   /*
    * 基本字体配置
    * */

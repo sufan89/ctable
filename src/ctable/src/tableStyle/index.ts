@@ -14,8 +14,8 @@ class TableStyleClass implements CTable.ITableStyle {
     } else {
       // 默认样式
       this.baseFont = {
-        textBaseline: "middle",
-        textAlign: "left",
+        textBaseline: "alphabetic",
+        textAlign: "start",
         fontStyle: "normal",
         fontVariant: "normal",
         fontWeight: 500,

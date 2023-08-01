@@ -5,7 +5,6 @@ class HeaderRowStyleClass implements CTable.IHeaderRowStyle {
   rowFill: CTable.fillStyle;
   rowFont: CTable.baseFont;
   rowPadding: CTable.padding;
-  rowType: "headerRow";
   /*
    * 当前表格配置信息
    * */
@@ -29,8 +28,8 @@ class HeaderRowStyleClass implements CTable.IHeaderRowStyle {
       this.rowFont = { ...tableConfig.baseFont };
     } else {
       this.rowFont = {
-        textBaseline: "middle",
-        textAlign: "left",
+        textBaseline: "alphabetic",
+        textAlign: "start",
         fontStyle: "normal",
         fontVariant: "normal",
         fontWeight: 500,
@@ -46,7 +45,6 @@ class HeaderRowStyleClass implements CTable.IHeaderRowStyle {
       right: 10,
       left: 10,
     };
-    this.rowType = "headerRow";
   }
   /*
    * 获取表格渲染行样式

@@ -16,7 +16,7 @@ declare namespace CTable {
     // 子单元格
     children?: Array<CTable.ICell>;
     // 单元格类型
-    cellType: "text" | "image" | "tag" | "custom" | "checkbox";
+    cellType: CTable.cellType;
     // 实际内容
     realVal: string;
     // 绘制单元格
@@ -39,10 +39,21 @@ declare namespace CTable {
     x: number;
     y: number;
   };
+  /*
+   * 单元格大小
+   * */
   export type size = {
     width: number;
     height: number;
   };
+  /*
+   * 单元格内容类型
+   * */
+  export type cellValueType = string | number | object | [];
+  /*
+   * 单元格类型
+   * */
+  export type cellType = "text" | "button" | "checkbox" | "custom" | "img";
   /*
    * 表格行接口
    * */
@@ -58,5 +69,5 @@ declare namespace CTable {
   /*
    * 表体行
    * */
-  export interface ITableRow extends IRow {}
+  export interface IBodyRow extends IRow {}
 }

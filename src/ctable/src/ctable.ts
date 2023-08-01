@@ -21,7 +21,7 @@ class tableClass implements CTable.ITable {
   /*
    * 表格配置项
    * */
-  private tableConfig: CTable.TableConfig;
+  tableConfig: CTable.TableConfig;
   /*
    * 当前画布大小,便于计算滚动条位置
    * */
@@ -38,6 +38,10 @@ class tableClass implements CTable.ITable {
    * 表格样式信息
    * */
   tableStyle: CTable.ITableStyle;
+  /*
+   * 表格行信息
+   * */
+  tableBody: Array<CTable.IBodyRow>;
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -61,6 +65,7 @@ class tableClass implements CTable.ITable {
     this.viewSize = [0, 0];
     // 表格样式
     this.tableStyle = new tableStyle(this.tableConfig);
+    this.tableBody = [];
     this.changeCanvasSize();
     // 初始化
     this.init();
