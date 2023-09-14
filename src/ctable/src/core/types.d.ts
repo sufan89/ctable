@@ -18,7 +18,7 @@ declare namespace CTable {
     // 单元格类型
     cellType: CTable.cellType;
     // 实际内容
-    realVal: string;
+    realVal: CTable.cellValueType;
     // 绘制单元格
     renderCell: Function;
     // 计算单元格大小
@@ -31,6 +31,8 @@ declare namespace CTable {
     rowHeight: number;
     // 设置行高
     setRowHeight: Function;
+    // 表头大小
+    headerSize: CTable.size;
   }
   /*
    * 位置
@@ -49,7 +51,7 @@ declare namespace CTable {
   /*
    * 单元格内容类型
    * */
-  export type cellValueType = string | number | object | [];
+  export type cellValueType = string | number | object | [] | null | undefined;
   /*
    * 单元格类型
    * */
@@ -57,17 +59,25 @@ declare namespace CTable {
   /*
    * 表格行接口
    * */
-  interface IRow {
+  export interface IRow {
     rowCells: Array<ICell>;
     renderRow: Function;
     rowHeight: number;
+    rowStyle: CTable.IRowStyle;
+    renderCell: Function;
   }
+  // /*
+  //  * 表头行
+  //  * */
+  // export interface IHeadRow extends IRow {}
+  // /*
+  //  * 表体行
+  //  * */
+  // export interface IBodyRow extends IRow {}
   /*
-   * 表头行
+   * 表格行数据类型
    * */
-  export interface IHeadRow extends IRow {}
-  /*
-   * 表体行
-   * */
-  export interface IBodyRow extends IRow {}
+  export type rowValueType = {
+    [key: string]: CTable.cellValueType;
+  };
 }

@@ -2,37 +2,39 @@ declare namespace CTable {
   /*
    * 表格配置
    * */
-  type TableConfig = {
+  export type TableConfig = {
     /*
      * 表格列配置信息
      * */
     Columns: Array<ColumnConfig>;
     /*
-     * 是否显示CheckBox列
-     * */
-    showCheckBox?: boolean;
-    /*
-     * 是否显示序号列
-     * */
-    showIndex?: boolean;
-    /*
      * 表头行样式
      * */
-    headRowStyle?: Function;
+    headRowStyle?: (headConfig: Array<ColumnConfig>) => IRowStyle;
     /*
      * 表头单元格样式
      * */
-    headCellStyle?: Function;
+    headCellStyle?: (headConfig: ColumnConfig) => ICellStyle;
     /*
      * 单元格样式
      * */
-    rowCellStyle?: Function;
+    rowCellStyle?: (
+      row: IRowValue,
+      column: ColumnConfig,
+      rowIndex: number,
+      columnIndex: number
+    ) => ICellStyle;
+    /*
+     * 表格行样式
+     * */
+    rowStyle?: (row: IRowValue, rowIndex: number) => IRowStyle;
     /*
      * 字体类型
      * */
     baseFont?: baseFont;
     /*
      * 显示边框
+     * 默认显示边框
      * */
     showBorder?: boolean;
   };
@@ -49,17 +51,13 @@ declare namespace CTable {
      * */
     label: string;
     /*
-     * 列宽
+     * 列宽,为空的话，则根据内容进行计算，设置之后如果当前宽度小于内容宽度，则根据内容宽度进行拉伸；保证列文本能平铺
      * */
     width?: string | number;
     /*
      * 列固定方式
      * */
     fixed?: "left" | "right";
-    /*
-     * 最小宽度
-     * */
-    minWidth?: string | number;
     /*
      * 内容对齐方式，默认是左对齐
      * */
@@ -71,7 +69,12 @@ declare namespace CTable {
     /*
      * 格式化函数
      * */
-    formatter?: Function;
+    formatter?: (
+      row: IRowValue,
+      column: ColumnConfig,
+      cellValue: cellValueType,
+      rowIndex: number
+    ) => cellValueType;
     /*
      * 是否排序
      * */
@@ -88,12 +91,12 @@ declare namespace CTable {
      * */
     showToolTip?: true | false;
   };
-  interface ITable {
+  export interface ITable {
     parentElement: HTMLElement | null;
     tableElement: HTMLCanvasElement | null;
     ctx: CanvasRenderingContext2D | null;
     canvasSize: [number, number];
-    tableHeader: CTable.IHeadRow | undefined;
+    tableHeader: CTable.IRow;
     tableStyle: CTable.ITableStyle;
   }
 }

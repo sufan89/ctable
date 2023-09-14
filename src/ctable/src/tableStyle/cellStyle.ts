@@ -7,44 +7,14 @@ class CellStyleClass implements ICellStyle {
   cellFont: CTable.baseFont;
   cellKey: string;
   cellPadding: CTable.padding;
-  constructor(
-    rowStyle: CTable.IHeaderRowStyle | CTable.IRowStyle,
-    colConfig: CTable.ColumnConfig
-  ) {
-    if (rowStyle) {
-      this.cellBorder = { ...rowStyle.rowBorder };
-      this.cellFill = { ...rowStyle.rowFill };
-      this.cellFont = { ...rowStyle.rowFont };
-      this.cellPadding = { ...rowStyle.rowPadding };
-    } else {
-      this.cellBorder = {
-        width: 1,
-        color: "#dfe6ec",
-      };
-      this.cellFill = {
-        color: "#F5F7FA",
-      };
-      this.cellFont = {
-        textBaseline: "alphabetic",
-        textAlign: "start",
-        fontStyle: "normal",
-        fontVariant: "normal",
-        fontWeight: 500,
-        fontSize: "24px",
-        lineHeight: 1.15,
-        fontFamily: "Microsoft YaHei",
-        fontColor: "#606266",
-      };
-      this.cellPadding = {
-        top: 10,
-        bottom: 10,
-        right: 10,
-        left: 10,
-      };
-    }
-    if (colConfig) {
-      this.cellFont.textAlign = colConfig.align || "left";
-    }
+  constructor(rowStyle: CTable.IRowStyle, colConfig: CTable.ColumnConfig) {
+    this.cellBorder = { ...rowStyle.rowBorder };
+    this.cellFill = { ...rowStyle.rowFill };
+    this.cellFont = { ...rowStyle.rowFont };
+    this.cellPadding = { ...rowStyle.rowPadding };
+    // if (colConfig) {
+    //   this.cellFont.textAlign = colConfig.align || "left";
+    // }
     // 生成单元格唯一KEY
     this.cellKey = Guid.create().toString();
   }

@@ -1,47 +1,21 @@
-import TableStyleClass from "@/ctable/src/tableStyle/index";
 /*
  * 表格行样式
  * */
-class tableRowStyle implements CTable.ITableRowStyle {
-  cellStyle: Array<CTable.ICellStyle>;
-  rowBorder: CTable.border;
-  rowFill: CTable.fillStyle;
-  rowFont: CTable.baseFont;
-  rowPadding: CTable.padding;
+import rowStyleClass from "@/ctable/src/tableStyle/rowStyle";
+
+class tableRowStyle extends rowStyleClass {
   /*
    * 当前表格配置信息
    * */
   private currentTableConfig: CTable.TableConfig;
-
-  constructor(tableConfig: CTable.TableConfig, tableStyle: TableStyleClass) {
-    this.cellStyle = new Array<CTable.ICellStyle>();
+  constructor(tableConfig: CTable.TableConfig, tableStyle: CTable.ITableStyle) {
+    super(tableStyle);
     this.currentTableConfig = tableConfig;
-    // 给默认值
-    this.rowBorder = {
-      width: 1,
-      color: "#dfe6ec",
-    };
+    // 默认背景是白色，后续可以通过配置进行调整
     this.rowFill = {
-      color: "#F5F7FA",
+      color: "#ffffff",
     };
-    this.rowFont = tableStyle.baseFont;
-    this.rowPadding = {
-      top: 10,
-      bottom: 10,
-      right: 10,
-      left: 10,
-    };
-  }
-  /*
-   * 获取表格渲染行样式
-   * */
-  getRowStyle(): CTable.IRowStyle {
-    return {
-      rowBorder: this.rowBorder,
-      rowFill: this.rowFill,
-      rowPadding: this.rowPadding,
-      rowFont: this.rowFont,
-    };
+    this.rowFont.fontWeight = 400;
   }
 }
 export default tableRowStyle;

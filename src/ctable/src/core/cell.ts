@@ -9,18 +9,20 @@ class CellClass implements CTable.ICell {
   public contentSize: CTable.size = { width: 0, height: 0 };
   public cellType: CTable.cellType;
   public children: Array<CTable.ICell>;
-  public realVal: string;
+  public realVal: CTable.cellValueType;
   public columnInfo: CTable.ColumnConfig;
   public rowHeight: number;
+  public headerSize: CTable.size;
   /**
    * canvas上下文
    */
-  ctx: CanvasRenderingContext2D | null;
+  ctx: CanvasRenderingContext2D;
 
   constructor(
     s: CTable.IRowStyle,
     context: CanvasRenderingContext2D,
-    colConfig: CTable.ColumnConfig
+    colConfig: CTable.ColumnConfig,
+    cellValue: CTable.cellValueType
   ) {
     this.cellStyle = new CellStyleClass(s, colConfig);
     this.cellKey = Guid.create().toString();
@@ -28,75 +30,89 @@ class CellClass implements CTable.ICell {
     this.cellPosition = { x: 0, y: 0 };
     this.cellType = colConfig.cellType || "text";
     this.children = new Array<CTable.ICell>();
-    this.realVal = "";
+    this.realVal = cellValue;
     this.columnInfo = colConfig;
     this.rowHeight = 0;
+    this.headerSize = {
+      width: 0,
+      height: 0,
+    };
   }
   /*
    * 渲染一个单元格
    * */
-  // eslint-disable-next-line no-unused-vars
-  public renderCell(val: CTable.cellValueType) {
+  public renderCell() {
     // 绘制单元格
     this.renderCellBody();
   }
   /*
    * 计算单元格大小
    * */
-  // eslint-disable-next-line no-unused-vars
-  calcCellSize(val: CTable.cellValueType) {}
+  calcCellSize() {}
   /*
    * 渲染一个单元格块
    * */
   renderCellBody() {
-    if (this.ctx) {
-      //绘制矩形
-      const cellHeight = this.getCellHeight();
-      if (this.cellStyle.cellBorder.width !== 0) {
-        // 绘制边框
-        const cellBorder: CTable.border = this.cellStyle.cellBorder;
-        this.ctx.strokeStyle = cellBorder.color;
-        this.ctx.lineWidth = cellBorder.width;
-        this.ctx.lineJoin = "bevel";
-        this.ctx.strokeRect(
-          this.cellPosition.x + cellBorder.width,
-          this.cellPosition.y + cellBorder.width,
-          this.cellSize.width,
-          cellHeight
-        );
-      }
-      this.ctx.fillStyle = this.cellStyle.cellFill.color;
-      this.ctx.fillRect(
-        this.cellPosition.x + this.cellStyle.cellBorder.width,
-        this.cellPosition.y + this.cellStyle.cellBorder.width,
+    //绘制矩形
+    const cellHeight = this.getCellHeight();
+    if (this.cellStyle.cellBorder.width !== 0) {
+      // 绘制边框
+      const cellBorder: CTable.border = this.cellStyle.cellBorder;
+      this.ctx.strokeStyle = cellBorder.color;
+      this.ctx.lineWidth = cellBorder.width;
+      this.ctx.lineJoin = "bevel";
+      this.ctx.strokeRect(
+        this.cellPosition.x + cellBorder.width,
+        this.cellPosition.y + cellBorder.width,
         this.cellSize.width,
         cellHeight
       );
     }
+    this.ctx.fillStyle = this.cellStyle.cellFill.color;
+    this.ctx.fillRect(
+      this.cellPosition.x + this.cellStyle.cellBorder.width,
+      this.cellPosition.y + this.cellStyle.cellBorder.width,
+      this.cellSize.width,
+      cellHeight
+    );
+    // 绘制内容框
+    const position = { x: 0, y: 0 };
+    const height = this.getCellHeight();
+    position.y = height - (height - this.contentSize.height) / 2;
+    this.ctx.fillStyle = "red";
+    this.ctx.fillRect(
+      this.cellPosition.x + this.cellStyle.cellPadding.left,
+      this.cellPosition.y + this.cellStyle.cellPadding.top,
+      this.contentSize.width,
+      this.contentSize.height
+    );
   }
   /*
    * 计算当前内容绘制的位置
    * */
   getContentPosition(): CTable.position {
-    const position = { x: 0, y: 0 };
-    const cellHeight = this.getCellHeight();
-    position.y = cellHeight - (cellHeight - this.contentSize.height) / 2;
-    // 对齐方式，默认为左对齐
-    switch (this.cellStyle.cellFont.textAlign) {
-      case "left":
-      case "start":
-        position.x = this.cellStyle.cellPadding.left;
-        break;
-      case "right":
-      case "end":
-        position.x = this.cellSize.width - this.cellStyle.cellPadding.right;
-        break;
-      case "center":
-        position.x = this.cellSize.width / 2;
-        break;
-      default:
-        break;
-    }
+    const position = {
+      x: this.cellStyle.cellPadding.left,
+      y: this.cellStyle.cellPadding.top,
+    };
+    // const cellHeight = this.getCellHeight();
+    // position.y = cellHeight - (cellHeight - this.contentSize.height) / 2;
+    // // 对齐方式，默认为左对齐
+    // switch (this.cellStyle.cellFont.textAlign) {
+    //   case "left":
+    //   case "start":
+    //     position.x = this.cellStyle.cellPadding.left;
+    //     break;
+    //   case "right":
+    //   case "end":
+    //     position.x = this.cellSize.width - this.cellStyle.cellPadding.right;
+    //     break;
+    //   case "center":
+    //     position.x = this.cellSize.width / 2;
+    //     break;
+    //   default:
+    //     break;
+    // }
     return position;
   }
   /*

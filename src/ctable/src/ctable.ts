@@ -4,6 +4,7 @@
  * */
 import headerRow from "./tableHeader";
 import tableStyle from "./tableStyle";
+import bodyRow from "./tableBody";
 
 class tableClass implements CTable.ITable {
   /**
@@ -33,7 +34,8 @@ class tableClass implements CTable.ITable {
   /*
    * 表头信息
    * */
-  tableHeader: CTable.IHeadRow | undefined;
+  // @ts-ignore
+  tableHeader: CTable.IRow;
   /*
    * 表格样式信息
    * */
@@ -41,7 +43,11 @@ class tableClass implements CTable.ITable {
   /*
    * 表格行信息
    * */
-  tableBody: Array<CTable.IBodyRow>;
+  tableBody: Array<CTable.IRow>;
+  /*
+   * 表格列信息-已进行了平铺
+   * */
+  tableColumns: Array<CTable.ICell>;
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -60,12 +66,23 @@ class tableClass implements CTable.ITable {
       this.parentElement.appendChild(this.tableElement);
     }
     this.tableConfig = tableConfig;
-    this.ctx = this.tableElement.getContext("2d");
     this.canvasSize = [0, 0];
     this.viewSize = [0, 0];
     // 表格样式
     this.tableStyle = new tableStyle(this.tableConfig);
     this.tableBody = [];
+    this.tableColumns = [];
+    this.ctx = this.tableElement.getContext("2d");
+    if (!this.ctx) {
+      console.error("当前浏览器不支持canvas绘制");
+      return;
+    }
+    // 初始化表头
+    this.tableHeader = new headerRow(
+      this.ctx,
+      this.tableConfig.Columns,
+      this.tableStyle.headerRowStyle
+    );
     this.changeCanvasSize();
     // 初始化
     this.init();
@@ -74,22 +91,9 @@ class tableClass implements CTable.ITable {
    * 根据配置进行初始化
    */
   private init() {
-    /*
-     * 获取表头信息
-     * */
-    if (this.ctx) {
-      this.tableHeader = new headerRow(
-        this.ctx,
-        this.tableConfig.Columns,
-        this.tableStyle.headerRowStyle
-      );
-    } else {
-      this.tableHeader = undefined;
-    }
-    if (this.tableHeader) {
-      this.tableHeader.renderRow(this);
-    }
-    console.log(this.tableHeader?.rowCells, "this.tableStyle");
+    this.tableHeader.renderRow(this);
+    // 平铺表格列信息
+    this.flatTableColumns(this.tableHeader.rowCells);
   }
   /*
    * 根据父节点内容，改变画布大小
@@ -110,8 +114,58 @@ class tableClass implements CTable.ITable {
    * 渲染表格数据
    * @param tableData 表格数据
    * */
-  public setTableData(tableData: Array<object>) {
-    console.log(tableData);
+  public setTableData(tableData: Array<CTable.rowValueType>) {
+    this.initTableBody(tableData);
+  }
+  /*
+   * 初始化表格行
+   * */
+  initTableBody(tableData: Array<CTable.rowValueType>) {
+    this.tableBody = [];
+    tableData.forEach((d, index) => {
+      if (this.ctx) {
+        const row = new bodyRow(
+          this.ctx,
+          this.tableColumns,
+          this.tableStyle.tableRowStyle,
+          d
+        );
+        row.calcRowSize();
+        if (index === 0) {
+          row.calcRowCellPosition({
+            x: 0,
+            y: this.tableHeader ? this.tableHeader?.rowHeight : 0,
+            width: this.canvasSize[0],
+            height: this.canvasSize[1],
+          });
+        } else {
+          row.calcRowCellPosition({
+            x: 0,
+            y: this.tableHeader
+              ? this.tableHeader?.rowHeight +
+                this.tableBody[index - 1].rowHeight
+              : 0,
+            width: this.canvasSize[0],
+            height: this.canvasSize[1],
+          });
+        }
+        row.renderRow();
+        this.tableBody.push(row);
+      }
+    });
+  }
+  /*
+   * 平铺表格列
+   * */
+  flatTableColumns(cols: Array<CTable.ICell>) {
+    cols.forEach((col) => {
+      if (col.children && col.children.length > 0) {
+        this.flatTableColumns(col.children);
+      } else {
+        // 只保留子节点
+        this.tableColumns.push(col);
+      }
+    });
   }
 }
 

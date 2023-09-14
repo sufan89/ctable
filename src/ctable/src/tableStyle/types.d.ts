@@ -2,18 +2,18 @@ declare namespace CTable {
   /*
    * 默认配置类型
    * */
-  interface ITableStyle {
+  export interface ITableStyle {
     /*
      * 总的字体类型
      * */
     baseFont: baseFont;
-    headerRowStyle: IHeaderRowStyle;
-    tableRowStyle: ITableRowStyle;
+    headerRowStyle: CTable.IRowStyle;
+    tableRowStyle: CTable.IRowStyle;
   }
   /*
    * 单元格样式配置
    * */
-  interface ICellStyle {
+  export interface ICellStyle {
     /*
      * 单元格字体
      * */
@@ -37,19 +37,17 @@ declare namespace CTable {
     /*
      * 获取字体配置
      * */
-    getFont: Function;
+    getFont: () => string;
   }
   /*
    * 行样式
    * */
-  interface IRowStyle {
+  export interface IRowStyle {
     rowFont: baseFont;
     rowPadding: padding;
     rowBorder: border;
     rowFill: fillStyle;
   }
-  interface ITableRowStyle extends IRowStyle {}
-  interface IHeaderRowStyle extends IRowStyle {}
   /*
    * 基本字体配置
    * */

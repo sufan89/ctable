@@ -3,10 +3,9 @@ import checkBoxCell from "../core/checkBoxCell";
 import imgCell from "../core/imgCell";
 import buttonCell from "../core/buttonCell";
 import customCell from "../core/customCell";
-import ICell = CTable.ICell;
-import { translatePxToNumber } from "../tools";
+import rowClass from "@/ctable/src/core/row";
 
-class tableHeader implements CTable.IHeadRow {
+class tableHeader extends rowClass {
   /*
    * 计算后的表头表格数据
    * */
@@ -26,30 +25,31 @@ class tableHeader implements CTable.IHeadRow {
   /*
    * 表头样式信息
    * */
-  private headStyleInfo: CTable.IHeaderRowStyle;
+  private headStyleInfo: CTable.IRowStyle;
   /*
    * 表头
    * */
   constructor(
     ctx: CanvasRenderingContext2D,
     headerConfig: Array<CTable.ColumnConfig>,
-    headStyle: CTable.IHeaderRowStyle
+    rowStyle: CTable.IRowStyle
   ) {
+    super(ctx, rowStyle);
     this.ctx = ctx;
     this.headerConfigInfo = headerConfig;
     this.rowCells = new Array<CTable.ICell>();
     this.rowHeight = 0;
     // 表头样式信息
-    this.headStyleInfo = headStyle;
+    this.headStyleInfo = rowStyle;
     // 初始化表头信息
-    this.initHeader();
+    this.initRow();
     // 计算行大小
     this.calcRowSize();
   }
   /*
    * 初始化
    * */
-  private initHeader() {
+  private initRow() {
     if (this.headerConfigInfo && this.headerConfigInfo.length > 0) {
       this.rowCells = this.generateHeadCells(this.headerConfigInfo);
     }
@@ -60,17 +60,17 @@ class tableHeader implements CTable.IHeadRow {
   getHeadCell(col: CTable.ColumnConfig): CTable.ICell {
     switch (col.cellType) {
       case "text":
-        return new textCell(this.headStyleInfo, this.ctx, col);
+        return new textCell(this.headStyleInfo, this.ctx, col, col.label);
       case "checkbox":
-        return new checkBoxCell(this.headStyleInfo, this.ctx, col);
+        return new checkBoxCell(this.headStyleInfo, this.ctx, col, col.label);
       case "img":
-        return new imgCell(this.headStyleInfo, this.ctx, col);
+        return new imgCell(this.headStyleInfo, this.ctx, col, col.label);
       case "button":
-        return new buttonCell(this.headStyleInfo, this.ctx, col);
+        return new buttonCell(this.headStyleInfo, this.ctx, col, col.label);
       case "custom":
-        return new customCell(this.headStyleInfo, this.ctx, col);
+        return new customCell(this.headStyleInfo, this.ctx, col, col.label);
       default:
-        return new textCell(this.headStyleInfo, this.ctx, col);
+        return new textCell(this.headStyleInfo, this.ctx, col, col.label);
     }
   }
   /*
@@ -87,7 +87,7 @@ class tableHeader implements CTable.IHeadRow {
           cell.children?.push(...this.generateHeadCells(col.children));
         }
         // 计算单元格大小
-        cell.calcCellSize(col.label);
+        cell.calcCellSize();
         cellList.push(cell);
       });
     }
@@ -109,77 +109,15 @@ class tableHeader implements CTable.IHeadRow {
     );
     if (this.rowCells && this.rowCells.length > 0) {
       this.rowCells.forEach((cell) => {
-        this.renderHeaderCell(cell);
+        this.renderCell(cell);
       });
     }
   }
   /*
    * 获取表头计算结果
    * */
-  public getHeaderInfo() {
+  public getRowInfo() {
     return this.rowCells;
-  }
-  /*
-   * 计算表头各个单元格大小，并根据大小确定绘制位置
-   * */
-  public calcRowSize() {
-    this.rowHeight = 0;
-    if (this.rowCells && this.rowCells.length > 0) {
-      this.rowCells.forEach((cell) => {
-        // 设置当前行高度
-        const cellSize = cell.getCellSize();
-        if (this.rowHeight < cellSize.height) {
-          this.rowHeight = cellSize.height;
-        }
-      });
-    }
-    // 将单元格设置成行高
-    this.rowCells.forEach((cell) => {
-      cell.setRowHeight(this.rowHeight);
-    });
-  }
-  /*
-   * 计算行所有单元格位置
-   * */
-  public calcRowCellPosition(
-    bbox: { x: number; y: number; width: number; height: number },
-    cells: Array<CTable.ICell>
-  ) {
-    let { x, y, width } = bbox;
-    if (cells && cells.length > 0) {
-      cells.forEach((cell) => {
-        // 为固定列
-        if (cell.columnInfo.fixed && cell.columnInfo.fixed === "right") {
-          cell.cellPosition = { x: width, y: y };
-          width = width - cell.cellSize.height;
-        } else {
-          cell.cellPosition = { x: x, y: y };
-          x = x + cell.cellSize.width;
-        }
-        if (cell.children && cell.children.length > 0) {
-          this.calcRowCellPosition(
-            {
-              x: cell.cellPosition.x,
-              y: cell.cellSize.height,
-              width: cell.cellSize.width,
-              height: cell.cellSize.height,
-            },
-            cell.children
-          );
-        }
-      });
-    }
-  }
-  /*
-   * 绘制表头单元格
-   * */
-  private renderHeaderCell(headCell: ICell) {
-    headCell.renderCell(headCell.columnInfo.label);
-    if (headCell.children && headCell.children.length > 0) {
-      headCell.children.forEach((child) => {
-        this.renderHeaderCell(child);
-      });
-    }
   }
 }
 export default tableHeader;
