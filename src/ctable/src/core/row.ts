@@ -61,7 +61,7 @@ class rowClass implements CTable.IRow {
     }
   }
   /*
-   * 绘制行
+   * 绘制行单元格
    * */
   renderCell(headCell: CTable.ICell) {
     headCell.renderCell();

@@ -3,7 +3,7 @@ import checkBoxCell from "../core/checkBoxCell";
 import imgCell from "../core/imgCell";
 import buttonCell from "../core/buttonCell";
 import customCell from "../core/customCell";
-import rowClass from "@/ctable/src/core/row";
+import rowClass from "../core/row";
 
 class tableHeader extends rowClass {
   /*

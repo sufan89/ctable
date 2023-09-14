@@ -164,12 +164,6 @@ class textCell extends cellClass {
         this.contentSize.height =
           this.textValue.length * headContentSize.height +
           this.textValue.length * this.cellStyle.cellFont.lineHeight;
-        console.log(
-          this.textValue,
-          headContentSize.height,
-          this.cellStyle.cellFont.lineHeight,
-          this.contentSize
-        );
       }
     }
   }

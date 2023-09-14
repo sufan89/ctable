@@ -19,7 +19,7 @@ declare namespace CTable {
      * 单元格样式
      * */
     rowCellStyle?: (
-      row: IRowValue,
+      row: rowValueType,
       column: ColumnConfig,
       rowIndex: number,
       columnIndex: number
@@ -27,7 +27,7 @@ declare namespace CTable {
     /*
      * 表格行样式
      * */
-    rowStyle?: (row: IRowValue, rowIndex: number) => IRowStyle;
+    rowStyle?: (row: rowValueType, rowIndex: number) => IRowStyle;
     /*
      * 字体类型
      * */
@@ -70,7 +70,7 @@ declare namespace CTable {
      * 格式化函数
      * */
     formatter?: (
-      row: IRowValue,
+      row: rowValueType,
       column: ColumnConfig,
       cellValue: cellValueType,
       rowIndex: number
