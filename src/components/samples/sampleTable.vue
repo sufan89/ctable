@@ -94,7 +94,7 @@ const tableConfig: CTable.TableConfig = {
     },
   ],
 };
-const tableData: Array<CTable.IRowValue> = [];
+const tableData: Array<CTable.rowValueType> = [];
 onMounted(() => {
   /*
    * 初始化1千条数据进行渲染

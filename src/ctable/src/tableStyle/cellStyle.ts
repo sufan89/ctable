@@ -12,9 +12,6 @@ class CellStyleClass implements ICellStyle {
     this.cellFill = { ...rowStyle.rowFill };
     this.cellFont = { ...rowStyle.rowFont };
     this.cellPadding = { ...rowStyle.rowPadding };
-    // if (colConfig) {
-    //   this.cellFont.textAlign = colConfig.align || "left";
-    // }
     // 生成单元格唯一KEY
     this.cellKey = Guid.create().toString();
   }

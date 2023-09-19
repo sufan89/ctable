@@ -76,25 +76,40 @@ class CellClass implements CTable.ICell {
       cellHeight
     );
     // 绘制内容框
-    const position = { x: 0, y: 0 };
-    const height = this.getCellHeight();
-    position.y = height - (height - this.contentSize.height) / 2;
-    this.ctx.fillStyle = "red";
-    this.ctx.fillRect(
-      this.cellPosition.x + this.cellStyle.cellPadding.left,
-      this.cellPosition.y + this.cellStyle.cellPadding.top,
-      this.contentSize.width,
-      this.contentSize.height
-    );
+    // const position = { x: 0, y: 0 };
+    // const height = this.getCellHeight();
+    // position.y = height - (height - this.contentSize.height) / 2;
+    // this.ctx.fillStyle = "red";
+    // this.ctx.fillRect(
+    //   this.cellPosition.x + this.cellStyle.cellPadding.left,
+    //   this.cellPosition.y + this.cellStyle.cellPadding.top,
+    //   this.contentSize.width,
+    //   this.contentSize.height
+    // );
   }
   /*
    * 计算当前内容绘制的位置
    * */
   getContentPosition(): CTable.position {
+    // 当前实际单元格大小
+    const realSize = {
+      width: this.cellSize.width,
+      height:
+        this.cellSize.height > this.rowHeight
+          ? this.cellSize.height
+          : this.rowHeight,
+    };
     const position = {
       x: this.cellStyle.cellPadding.left,
       y: this.cellStyle.cellPadding.top,
     };
+    console.log(
+      this.contentSize,
+      this.cellSize,
+      this.rowHeight,
+      realSize,
+      "this.contentSize"
+    );
     // const cellHeight = this.getCellHeight();
     // position.y = cellHeight - (cellHeight - this.contentSize.height) / 2;
     // // 对齐方式，默认为左对齐

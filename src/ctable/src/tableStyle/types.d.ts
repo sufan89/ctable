@@ -62,7 +62,7 @@ declare namespace CTable {
     textAlign: "start" | "end" | "center" | "left" | "right";
     fontStyle: "normal" | "italic" | "oblique";
     fontVariant: "normal" | "small-caps";
-    fontWeight: string | number;
+    fontWeight: number;
     fontSize: string | number;
     lineHeight: number;
     fontFamily: string;

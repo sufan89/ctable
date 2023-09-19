@@ -31,6 +31,7 @@ class textCell extends cellClass {
       width: Math.ceil(textMetrics.width),
       height: translatePxToNumber(this.cellStyle.cellFont.fontSize, "px"),
     };
+    // 如果有表头大小，则表明非表头
     if (this.headerSize.width !== 0 && this.headerSize.height !== 0) {
       // 表格行单元格
       this.splitText();
@@ -74,31 +75,33 @@ class textCell extends cellClass {
     this.ctx.fillStyle = this.cellStyle.cellFont.fontColor;
     const contentPosition = this.getContentPosition();
     if (this.textValue.length > 0) {
-      const textMetrics = this.ctx.measureText(this.textValue[0]);
-      const textRowHeight = Math.ceil(
-        textMetrics.actualBoundingBoxAscent +
-          textMetrics.actualBoundingBoxDescent
-      );
-      for (let index = 0; index < this.textValue.length; index++) {
-        const positionY =
-          index === 0
-            ? this.cellPosition.y + contentPosition.y
-            : this.cellPosition.y +
-              contentPosition.y +
-              textRowHeight * index +
-              this.cellStyle.cellFont.lineHeight * index * 1.5;
-        this.ctx.fillText(
-          this.textValue[index],
-          this.cellPosition.x + contentPosition.x,
-          positionY,
-          this.cellSize.width
-        );
-      }
+      this.renderMultiLineText(contentPosition);
     } else {
       this.ctx.fillText(
         this.realVal as string,
         this.cellPosition.x + contentPosition.x,
         this.cellPosition.y + contentPosition.y,
+        this.cellSize.width
+      );
+    }
+  }
+  /*
+   * 渲染多行文本
+   * */
+  renderMultiLineText(contentPosition: CTable.position) {
+    const textMetrics = this.ctx.measureText(this.textValue[0]);
+    const textRowHeight = Math.ceil(
+      textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent
+    );
+    for (let index = 0; index < this.textValue.length; index++) {
+      const positionY =
+        this.cellPosition.y +
+        contentPosition.y +
+        this.cellStyle.cellFont.lineHeight * textRowHeight * index;
+      this.ctx.fillText(
+        this.textValue[index],
+        this.cellPosition.x + contentPosition.x,
+        positionY,
         this.cellSize.width
       );
     }
@@ -161,9 +164,15 @@ class textCell extends cellClass {
             showValue = "";
           }
         }
+        const rowTextMetrices = this.ctx.measureText(this.textValue[0]);
+        const textRowHeight = Math.ceil(
+          rowTextMetrices.actualBoundingBoxAscent +
+            rowTextMetrices.actualBoundingBoxDescent
+        );
         this.contentSize.height =
-          this.textValue.length * headContentSize.height +
-          this.textValue.length * this.cellStyle.cellFont.lineHeight;
+          this.textValue.length *
+          this.cellStyle.cellFont.lineHeight *
+          textRowHeight;
       }
     }
   }

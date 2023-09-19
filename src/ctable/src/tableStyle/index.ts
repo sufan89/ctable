@@ -19,7 +19,7 @@ class TableStyleClass implements CTable.ITableStyle {
         fontVariant: "normal",
         fontWeight: 500,
         fontSize: "12px",
-        lineHeight: 2,
+        lineHeight: 1.5,
         fontFamily: "Microsoft YaHei",
         fontColor: "#606266",
       };

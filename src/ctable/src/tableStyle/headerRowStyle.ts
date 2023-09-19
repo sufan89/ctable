@@ -11,6 +11,7 @@ class HeaderRowStyleClass extends rowStyleClass {
     this.currentTableConfig = tableConfig;
     const { headRowStyle } = this.currentTableConfig;
     if (headRowStyle) {
+      // 如果配置了表头样式函数，则使用表头样式函数返回样式
       const rowStyle = headRowStyle(this.currentTableConfig.Columns);
       const { rowFont, rowFill, rowPadding, rowBorder } = rowStyle;
       if (rowFont) {
