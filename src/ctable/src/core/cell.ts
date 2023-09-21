@@ -55,6 +55,8 @@ class CellClass implements CTable.ICell {
   renderCellBody() {
     //绘制矩形
     const cellHeight = this.getCellHeight();
+    const cellWidth =
+      this.headerSize.width > 0 ? this.headerSize.width : this.cellSize.width;
     if (this.cellStyle.cellBorder.width !== 0) {
       // 绘制边框
       const cellBorder: CTable.border = this.cellStyle.cellBorder;
@@ -64,7 +66,7 @@ class CellClass implements CTable.ICell {
       this.ctx.strokeRect(
         this.cellPosition.x + cellBorder.width,
         this.cellPosition.y + cellBorder.width,
-        this.cellSize.width,
+        cellWidth,
         cellHeight
       );
     }
@@ -72,20 +74,9 @@ class CellClass implements CTable.ICell {
     this.ctx.fillRect(
       this.cellPosition.x + this.cellStyle.cellBorder.width,
       this.cellPosition.y + this.cellStyle.cellBorder.width,
-      this.cellSize.width,
+      cellWidth,
       cellHeight
     );
-    // 绘制内容框
-    // const position = { x: 0, y: 0 };
-    // const height = this.getCellHeight();
-    // position.y = height - (height - this.contentSize.height) / 2;
-    // this.ctx.fillStyle = "red";
-    // this.ctx.fillRect(
-    //   this.cellPosition.x + this.cellStyle.cellPadding.left,
-    //   this.cellPosition.y + this.cellStyle.cellPadding.top,
-    //   this.contentSize.width,
-    //   this.contentSize.height
-    // );
   }
   /*
    * 计算当前内容绘制的位置
@@ -103,31 +94,27 @@ class CellClass implements CTable.ICell {
       x: this.cellStyle.cellPadding.left,
       y: this.cellStyle.cellPadding.top,
     };
-    console.log(
-      this.contentSize,
-      this.cellSize,
-      this.rowHeight,
-      realSize,
-      "this.contentSize"
-    );
-    // const cellHeight = this.getCellHeight();
-    // position.y = cellHeight - (cellHeight - this.contentSize.height) / 2;
-    // // 对齐方式，默认为左对齐
-    // switch (this.cellStyle.cellFont.textAlign) {
-    //   case "left":
-    //   case "start":
-    //     position.x = this.cellStyle.cellPadding.left;
-    //     break;
-    //   case "right":
-    //   case "end":
-    //     position.x = this.cellSize.width - this.cellStyle.cellPadding.right;
-    //     break;
-    //   case "center":
-    //     position.x = this.cellSize.width / 2;
-    //     break;
-    //   default:
-    //     break;
-    // }
+    const cellHeight = this.getCellHeight();
+    position.y = (cellHeight - this.contentSize.height) / 2;
+    // 对齐方式，默认为左对齐
+    switch (this.columnInfo.align) {
+      case "left":
+      case "start":
+        position.x = this.cellStyle.cellPadding.left;
+        break;
+      case "right":
+      case "end":
+        position.x =
+          this.cellSize.width -
+          this.contentSize.width -
+          this.cellStyle.cellPadding.right;
+        break;
+      case "center":
+        position.x = (realSize.width - this.contentSize.width) / 2;
+        break;
+      default:
+        break;
+    }
     return position;
   }
   /*

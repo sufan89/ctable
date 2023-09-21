@@ -115,6 +115,7 @@ class tableClass implements CTable.ITable {
    * @param tableData 表格数据
    * */
   public setTableData(tableData: Array<CTable.rowValueType>) {
+    this.ctx?.clearRect(0, 0, this.canvasSize[0], this.canvasSize[1]);
     this.initTableBody(tableData);
   }
   /*
@@ -122,7 +123,8 @@ class tableClass implements CTable.ITable {
    * */
   initTableBody(tableData: Array<CTable.rowValueType>) {
     this.tableBody = [];
-    tableData.forEach((d, index) => {
+    let offsetHeight = this.tableHeader.rowHeight;
+    tableData.forEach((d) => {
       if (this.ctx) {
         const row = new bodyRow(
           this.ctx,
@@ -131,25 +133,18 @@ class tableClass implements CTable.ITable {
           d
         );
         row.calcRowSize();
-        if (index === 0) {
-          row.calcRowCellPosition({
-            x: 0,
-            y: this.tableHeader ? this.tableHeader?.rowHeight : 0,
-            width: this.canvasSize[0],
-            height: this.canvasSize[1],
-          });
-        } else {
-          row.calcRowCellPosition({
-            x: 0,
-            y: this.tableHeader
-              ? this.tableHeader?.rowHeight +
-                this.tableBody[index - 1].rowHeight
-              : 0,
-            width: this.canvasSize[0],
-            height: this.canvasSize[1],
-          });
+        row.calcRowCellPosition({
+          x: 0,
+          y: offsetHeight,
+          width: this.canvasSize[0],
+          height: this.canvasSize[1],
+        });
+        offsetHeight = row.rowHeight + offsetHeight;
+        // 超过了当前画布大小了，就不进行绘制了，开启滚动条
+        // 多渲染一行
+        if (offsetHeight - row.rowHeight < this.canvasSize[1]) {
+          row.renderRow();
         }
-        row.renderRow();
         this.tableBody.push(row);
       }
     });

@@ -144,7 +144,7 @@ class bodyRow extends rowClass {
         // 为固定列
         if (cell.columnInfo.fixed && cell.columnInfo.fixed === "right") {
           cell.cellPosition = { x: width, y: y };
-          width = width - cell.cellSize.height;
+          width = width - cell.cellSize.width;
         } else {
           cell.cellPosition = { x: x, y: y };
           x = x + cell.cellSize.width;

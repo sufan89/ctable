@@ -36,11 +36,12 @@ class textCell extends cellClass {
       // 表格行单元格
       this.splitText();
       this.contentSize.width =
-        this.headerSize.width -
-        this.cellStyle.cellPadding.left -
-        this.cellStyle.cellPadding.right;
+        this.contentSize.width > this.headerSize.width
+          ? this.headerSize.width -
+            this.cellStyle.cellPadding.left -
+            this.cellStyle.cellPadding.right
+          : this.contentSize.width;
     }
-
     let cellWidth = 0;
     // 单元格高度=内容高度+上边距+下边距
     const cellHeight =
@@ -55,9 +56,15 @@ class textCell extends cellClass {
     } else {
       // 没有子，则取内容宽度+左边距+右边距
       cellWidth =
-        this.contentSize.width +
-        this.cellStyle.cellPadding.right +
-        this.cellStyle.cellPadding.left;
+        this.headerSize.width > 0
+          ? this.headerSize.width
+          : this.contentSize.width +
+            this.cellStyle.cellPadding.right +
+            this.cellStyle.cellPadding.left;
+    }
+    if (this.columnInfo.width) {
+      const colWidth = translatePxToNumber(this.columnInfo.width, "px");
+      cellWidth = cellWidth > colWidth ? cellWidth : colWidth;
     }
     // 当前单元格宽带为内容宽度+内边距宽度
     this.cellSize = {
@@ -115,7 +122,7 @@ class textCell extends cellClass {
   /*
    * 根据当前单元格大小，分割文本
    * */
-  splitText() {
+  private splitText() {
     // 表头内容大小
     const headContentSize = {
       width:
@@ -163,11 +170,14 @@ class textCell extends cellClass {
             this.textValue.push(showValue);
             showValue = "";
           }
+          if (index === valueArray.length - 1 && showValue !== "") {
+            this.textValue.push(showValue);
+          }
         }
-        const rowTextMetrices = this.ctx.measureText(this.textValue[0]);
+        const rowTextMetrics = this.ctx.measureText(this.textValue[0]);
         const textRowHeight = Math.ceil(
-          rowTextMetrices.actualBoundingBoxAscent +
-            rowTextMetrices.actualBoundingBoxDescent
+          rowTextMetrics.actualBoundingBoxAscent +
+            rowTextMetrics.actualBoundingBoxDescent
         );
         this.contentSize.height =
           this.textValue.length *
