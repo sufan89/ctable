@@ -65,15 +65,11 @@ declare namespace CTable {
     rowHeight: number;
     rowStyle: CTable.IRowStyle;
     renderCell: Function;
+    /*
+     * 获取当前行宽度
+     * */
+    getRowWidth: () => number;
   }
-  // /*
-  //  * 表头行
-  //  * */
-  // export interface IHeadRow extends IRow {}
-  // /*
-  //  * 表体行
-  //  * */
-  // export interface IBodyRow extends IRow {}
   /*
    * 表格行数据类型
    * */

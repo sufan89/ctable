@@ -71,5 +71,15 @@ class rowClass implements CTable.IRow {
       });
     }
   }
+  /*
+   * 获取行宽度
+   * */
+  getRowWidth() {
+    let width = 0;
+    this.rowCells.forEach((r) => {
+      width = r.cellSize.width + width;
+    });
+    return width;
+  }
 }
 export default rowClass;

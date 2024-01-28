@@ -41,7 +41,7 @@ declare namespace CTable {
   /*
    * 表格列配置
    * */
-  type ColumnConfig = {
+  export type ColumnConfig = {
     /*
      * 列名
      * */
@@ -95,8 +95,9 @@ declare namespace CTable {
     parentElement: HTMLElement | null;
     tableElement: HTMLCanvasElement | null;
     ctx: CanvasRenderingContext2D | null;
-    canvasSize: [number, number];
+    canvasSize: CTable.size;
     tableHeader: CTable.IRow;
     tableStyle: CTable.ITableStyle;
+    tableScrollBar: CTable.IScrollBar;
   }
 }

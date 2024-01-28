@@ -3,10 +3,12 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 // import HelloWorld from "./components/HelloWorld.vue";
 import sampleTableVue from "./components/samples/sampleTable.vue";
+// import translateText from "./components/translateText/index.vue";
 </script>
 
 <template>
   <sampleTableVue></sampleTableVue>
+  <!--  <translateText></translateText>-->
 </template>
 
 <style>

@@ -102,8 +102,8 @@ class tableHeader extends rowClass {
       {
         x: 0,
         y: 0,
-        width: context.canvasSize[0],
-        height: context.canvasSize[1],
+        width: context.canvasSize.width,
+        height: context.canvasSize.height,
       },
       this.rowCells
     );
