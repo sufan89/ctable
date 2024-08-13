@@ -139,19 +139,6 @@ onMounted(() => {
     tableData.push(item);
   }
   myTable = new CTable("myTable", tableConfig);
-  // myTable.setTableData([
-  //   {
-  //     companyCode: "HTYL",
-  //     companyName:
-  //       "湖南昊途运力信息科技有限公司湖南昊途运力信息科技有限公司湖南昊途运力信息科技有限公司湖南昊途运力1",
-  //     accountId: "91430100MA4QJW5X0R",
-  //     taxIdentifyNo: null,
-  //     openStatus: 1,
-  //     openTime: "2021-05-03 14:09:26",
-  //     createdTime: "2021-05-03 14:09:26",
-  //     updatedTime: "2021-05-03 14:09:26",
-  //   },
-  // ]);
   myTable.setTableData(tableData);
 });
 </script>

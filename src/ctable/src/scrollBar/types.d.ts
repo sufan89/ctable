@@ -1,4 +1,7 @@
 declare namespace CTable {
+  /*
+   * 表格滚动条
+   * */
   interface IScrollBar {
     /*
      * 表格大小
@@ -28,10 +31,6 @@ declare namespace CTable {
      * */
     setBarPosition: (position: { v: number; h: number }) => void;
     /*
-     * 滚动条元素
-     * */
-    barElement: HTMLElement;
-    /*
      * 设置表格大小
      * */
     setTableSize: (size: CTable.size) => void;
@@ -39,5 +38,85 @@ declare namespace CTable {
      * 设置可视化大小
      * */
     setViewSize: (viewSize: CTable.size) => void;
+    /*
+     * 垂直滚动条
+     * */
+    verticalScroll: CTable.IBar | null;
+    /*
+     * 水平滚动条
+     * */
+    horizontalScroll: CTable.IBar | null;
+    /*
+     * 设置滚动条显示状态
+     * */
+    showScrollBar: (
+      showVerticalBar: boolean,
+      showHorizontalBar: boolean
+    ) => void;
+    /*
+     * 添加事件
+     * */
+    addEvent: (
+      eventName: string,
+      callBack: Function,
+      callOnce?: boolean
+    ) => void;
+    /*
+     * 移除事件
+     * */
+    removeEvent: (eventName: string) => void;
+  }
+  /*
+   * 滚动条
+   * */
+  interface IBar {
+    /*
+     * 是否显示滚动条
+     * */
+    isShow: boolean;
+    /*
+     * 滚动条元素
+     * */
+    barElement: HTMLElement | null;
+    /*
+     * 滚动条内容元素
+     * */
+    barContentElement: HTMLElement | null;
+    /*
+     * 滚动条，当前的位置
+     * */
+    currentPosition: number;
+    /*
+     * 滚动区域尺寸
+     * */
+    scrollSize: number;
+    /*
+     * 设置滚动条位置
+     * */
+    setPosition: (position: number) => void;
+    /*
+     * 设置滚动条大小
+     * */
+    setBarSize: (val: number) => void;
+    /*
+     * 设置滚动条内容大小，以实现滚动
+     * */
+    setBarContentSize: (val: number) => void;
+    /*
+     * 设置滚动条样式
+     * */
+    setBarStyle: (style: { [key: string]: string | number }) => void;
+    /*
+     * 添加事件
+     * */
+    addEvent: (
+      eventName: string,
+      callBack: Function,
+      callOnce?: boolean
+    ) => void;
+    /*
+     * 移除事件
+     * */
+    removeEvent: (eventName: string) => void;
   }
 }

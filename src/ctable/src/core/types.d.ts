@@ -42,7 +42,7 @@ declare namespace CTable {
     y: number;
   };
   /*
-   * 单元格大小
+   * 尺寸
    * */
   export type size = {
     width: number;
@@ -69,6 +69,10 @@ declare namespace CTable {
      * 获取当前行宽度
      * */
     getRowWidth: () => number;
+    /*
+     * 计算当前行单元格尺寸
+     * */
+    calcRowCellPosition: Function;
   }
   /*
    * 表格行数据类型

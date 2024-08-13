@@ -74,6 +74,7 @@ class tableClass implements CTable.ITable {
      * 表格滚动条
      * */
     this.tableScrollBar = new scrollBarClass(this.parentElement);
+    this.tableScrollBar.addEvent("scroll", this.scrollEvent.bind(this));
     this.tableConfig = tableConfig;
     this.canvasSize = {
       width: 0,
@@ -98,6 +99,7 @@ class tableClass implements CTable.ITable {
       this.tableConfig.Columns,
       this.tableStyle.headerRowStyle
     );
+    // 根据父节点调整表格尺寸
     this.changeCanvasSize();
     // 初始化
     this.init();
@@ -109,25 +111,33 @@ class tableClass implements CTable.ITable {
     this.tableHeader.renderRow(this);
     // 平铺表格列信息
     this.flatTableColumns(this.tableHeader.rowCells);
+    // 设置滚动条宽度
+    this.tableScrollBar.setTableSize({
+      height: 0,
+      width: this.tableHeader.getRowWidth(),
+    });
+    // 重新设置可视区域大小
+    this.tableScrollBar.setViewSize({
+      width: this.tableElement.width,
+      height: this.tableElement.height - this.tableHeader.rowHeight,
+    });
   }
   /*
    * 根据父节点内容，改变画布大小
    * */
   private changeCanvasSize() {
     const boundRect = this.parentElement?.getBoundingClientRect();
-    const headerRowWidth = this.tableHeader.getRowWidth();
-    this.tableElement.width = headerRowWidth ? headerRowWidth : 200;
+    this.tableElement.width = boundRect ? boundRect.width : 200;
     this.tableElement.height = boundRect ? boundRect.height : 200;
     this.viewSize = {
       width: this.tableElement.width,
       height: this.tableElement.height,
     };
-    console.log(this.tableHeader.getRowWidth(), "getRowWidth");
-    // this.tableScrollBar.setViewSize(this.viewSize);
+    this.tableScrollBar.setViewSize(this.viewSize);
   }
 
   /*
-   * 重新渲染
+   * 重新渲染-刷新
    * */
   public reRender() {}
 
@@ -143,7 +153,9 @@ class tableClass implements CTable.ITable {
    * */
   initTableBody(tableData: Array<CTable.rowValueType>) {
     this.tableBody = [];
+    // 表头高度
     let offsetHeight = this.tableHeader.rowHeight;
+    let bodyHeight: number = 0;
     tableData.forEach((d) => {
       if (this.ctx) {
         const row = new bodyRow(
@@ -160,6 +172,7 @@ class tableClass implements CTable.ITable {
           height: this.viewSize.height,
         });
         offsetHeight = row.rowHeight + offsetHeight;
+        bodyHeight = bodyHeight + row.rowHeight;
         // 超过了当前画布大小了，就不进行绘制了，开启滚动条
         // 多渲染一行
         if (offsetHeight - row.rowHeight < this.viewSize.height) {
@@ -167,6 +180,10 @@ class tableClass implements CTable.ITable {
         }
         this.tableBody.push(row);
       }
+    });
+    this.tableScrollBar.setTableSize({
+      width: this.tableHeader.getRowWidth(),
+      height: bodyHeight,
     });
   }
   /*
@@ -181,6 +198,47 @@ class tableClass implements CTable.ITable {
         this.tableColumns.push(col);
       }
     });
+  }
+  /*
+   * 滚动条事件
+   * */
+  scrollEvent(data: {
+    scrollTop: number;
+    scrollHeight: number;
+    scrollLeft: number;
+    scrollWidth: number;
+  }) {
+    const { scrollTop, scrollLeft } = data;
+    // 偏移进行绘制
+    this.offsetRender({ scrollTop, scrollLeft });
+  }
+  /*
+   * 偏移渲染
+   * */
+  offsetRender(data: { scrollTop: number; scrollLeft: number }) {
+    const { scrollTop = 0, scrollLeft = 0 } = data;
+    // 先渲染列信息
+    //  清空绘制区域
+    this.ctx?.clearRect(0, 0, this.viewSize.width, this.viewSize.height);
+    // 绘制表格区域
+    let offsetHeight: number = this.tableHeader.rowHeight - scrollTop;
+    for (let index = 0; index < this.tableBody.length; index++) {
+      const bodyRow: CTable.IRow = this.tableBody[index];
+      bodyRow.calcRowCellPosition({
+        x: -scrollLeft,
+        y: offsetHeight,
+        width: this.viewSize.width,
+        height: this.viewSize.height,
+      });
+      offsetHeight = offsetHeight + bodyRow.rowHeight;
+      if (offsetHeight - bodyRow.rowHeight < this.viewSize.height) {
+        bodyRow.renderRow();
+      } else {
+        break;
+      }
+    }
+    // 最后绘制表头
+    this.tableHeader.renderRow(this, -scrollLeft);
   }
 }
 

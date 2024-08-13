@@ -96,11 +96,11 @@ class tableHeader extends rowClass {
   /*
    * 表头渲染
    * */
-  public renderRow(context: CTable.ITable) {
+  public renderRow(context: CTable.ITable, x: number = 0) {
     // 计算行中每个单元格的位置
     this.calcRowCellPosition(
       {
-        x: 0,
+        x: x,
         y: 0,
         width: context.canvasSize.width,
         height: context.canvasSize.height,

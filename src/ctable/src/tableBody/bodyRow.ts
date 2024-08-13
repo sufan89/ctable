@@ -4,7 +4,6 @@ import imgCell from "@/ctable/src/core/imgCell";
 import buttonCell from "@/ctable/src/core/buttonCell";
 import customCell from "@/ctable/src/core/customCell";
 import rowClass from "@/ctable/src/core/row";
-import cellValueType = CTable.cellValueType;
 
 class bodyRow extends rowClass {
   /*
