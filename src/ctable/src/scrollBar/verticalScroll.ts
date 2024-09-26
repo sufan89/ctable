@@ -35,7 +35,11 @@ class verticalScrollClass implements CTable.IBar {
    * 设置当前滚动条位置
    * 主要用于初始化设置滚动条位置
    * */
-  setPosition(position: number): void {}
+  setPosition(position: number): void {
+    if (this.barElement) {
+      this.barElement.scrollTop = position;
+    }
+  }
 
   /*
    * 设置滚动条样式
@@ -94,6 +98,12 @@ class verticalScrollClass implements CTable.IBar {
    * */
   removeEvent(eventName: string) {
     this.scrollEvent.clearEvent(eventName);
+  }
+  /*
+   * 获取滚动区域大小
+   * */
+  getScrollSize(): number {
+    return this.barElement.scrollHeight;
   }
 }
 

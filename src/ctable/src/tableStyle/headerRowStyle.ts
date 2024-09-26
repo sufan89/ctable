@@ -10,9 +10,16 @@ class HeaderRowStyleClass extends rowStyleClass {
     super(tableStyle);
     this.currentTableConfig = tableConfig;
     const { headRowStyle } = this.currentTableConfig;
-    if (headRowStyle) {
+    let rowStyle: CTable.IRowStyle | undefined;
+    if (typeof headRowStyle === "function") {
+      rowStyle = headRowStyle(this.currentTableConfig.Columns);
+    } else if (headRowStyle) {
+      rowStyle = headRowStyle;
+    } else {
+      rowStyle = undefined;
+    }
+    if (rowStyle) {
       // 如果配置了表头样式函数，则使用表头样式函数返回样式
-      const rowStyle = headRowStyle(this.currentTableConfig.Columns);
       const { rowFont, rowFill, rowPadding, rowBorder } = rowStyle;
       if (rowFont) {
         this.rowFont = rowFont;

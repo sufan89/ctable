@@ -6,6 +6,8 @@ import headerRow from "./tableHeader";
 import tableStyle from "./tableStyle";
 import bodyRow from "./tableBody";
 import scrollBarClass from "./scrollBar";
+import eventBus from "./event/event";
+import TableEventClass from "./event/tableEvent";
 
 class tableClass implements CTable.ITable {
   /**
@@ -31,7 +33,7 @@ class tableClass implements CTable.ITable {
   /*
    * 当前活动视口大小
    * */
-  public viewSize: CTable.size;
+  viewSize: CTable.size;
   /*
    * 表头信息
    * */
@@ -53,6 +55,33 @@ class tableClass implements CTable.ITable {
    * 表格滚动条
    * */
   tableScrollBar: CTable.IScrollBar;
+  /*
+   * 表格事件
+   * */
+  tableEvent: CTable.IEventBus;
+  /*
+   * 鼠标滚动速率
+   * */
+  wheelSpeed: number;
+  /*
+   * 当前滚动的偏移量
+   * */
+  offsetInfo: {
+    scrollTop: number;
+    scrollLeft: number;
+  };
+  /*
+   * 当前按下键盘按钮code
+   * */
+  pressKeyCode: string;
+  /*
+   * 当前鼠标指针是否在画布内
+   * */
+  isMouseIn: boolean;
+  /*
+   * 表格事件，处理表格事件相关
+   * */
+  tableEventObj: CTable.ITableEvent;
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -70,6 +99,18 @@ class tableClass implements CTable.ITable {
     if (this.parentElement !== null) {
       this.parentElement.appendChild(this.tableElement);
     }
+    const { wheelSpeed } = tableConfig;
+    if (wheelSpeed) {
+      this.wheelSpeed = wheelSpeed;
+    } else {
+      this.wheelSpeed = 0.5;
+    }
+    this.pressKeyCode = "";
+    this.isMouseIn = false;
+    this.offsetInfo = { scrollTop: 0, scrollLeft: 0 };
+    // 初始化表格事件
+    this.tableEvent = new eventBus();
+    this.tableEventObj = new TableEventClass(this);
     /*
      * 表格滚动条
      * */
@@ -135,17 +176,16 @@ class tableClass implements CTable.ITable {
     };
     this.tableScrollBar.setViewSize(this.viewSize);
   }
-
   /*
    * 重新渲染-刷新
    * */
   public reRender() {}
-
   /*
    * 渲染表格数据
    * @param tableData 表格数据
    * */
   public setTableData(tableData: Array<CTable.rowValueType>) {
+    this.offsetInfo = { scrollTop: 0, scrollLeft: 0 };
     this.initTableBody(tableData);
   }
   /*
@@ -217,7 +257,7 @@ class tableClass implements CTable.ITable {
    * */
   offsetRender(data: { scrollTop: number; scrollLeft: number }) {
     const { scrollTop = 0, scrollLeft = 0 } = data;
-    // 先渲染列信息
+    this.offsetInfo = data;
     //  清空绘制区域
     this.ctx?.clearRect(0, 0, this.viewSize.width, this.viewSize.height);
     // 绘制表格区域
@@ -239,6 +279,22 @@ class tableClass implements CTable.ITable {
     }
     // 最后绘制表头
     this.tableHeader.renderRow(this, -scrollLeft);
+  }
+  /*
+   * 添加事件
+   * */
+  on(eventName: string, callBack: Function, callOnce?: boolean) {
+    if (callOnce) {
+      this.tableEvent.subscribeOnce(eventName, callBack);
+    } else {
+      this.tableEvent.subscribe(eventName, callBack);
+    }
+  }
+  /*
+   * 移除事件
+   * */
+  removeEvent(eventName: string) {
+    this.tableEvent.clearEvent(eventName);
   }
 }
 

@@ -81,8 +81,13 @@ class scrollBarClass implements CTable.IScrollBar {
     this.scrollEvent.clearEvent(eventName);
   }
 
-  setBarPosition(position: { v: number; h: number }) {
-    console.log(position, "position");
+  setBarPosition(position: { scrollLeft: number; scrollTop: number }) {
+    if (this.verticalScroll) {
+      this.verticalScroll.setPosition(position.scrollTop);
+    }
+    if (this.horizontalScroll) {
+      this.horizontalScroll.setPosition(position.scrollLeft);
+    }
   }
 
   /*
@@ -150,6 +155,19 @@ class scrollBarClass implements CTable.IScrollBar {
       scrollTop: this.verticalScroll?.currentPosition,
       scrollHeight: this.verticalScroll?.scrollSize,
     });
+  }
+  /*
+   * 获取滚动区域大小
+   * */
+  getScrollSize(): CTable.size {
+    const size: CTable.size = { width: 0, height: 0 };
+    if (this.horizontalScroll) {
+      size.width = this.horizontalScroll.getScrollSize();
+    }
+    if (this.verticalScroll) {
+      size.height = this.verticalScroll.getScrollSize();
+    }
+    return size;
   }
 }
 

@@ -29,7 +29,10 @@ declare namespace CTable {
     /*
      * 设置滚动条位置
      * */
-    setBarPosition: (position: { v: number; h: number }) => void;
+    setBarPosition: (position: {
+      scrollLeft: number;
+      scrollTop: number;
+    }) => void;
     /*
      * 设置表格大小
      * */
@@ -65,6 +68,10 @@ declare namespace CTable {
      * 移除事件
      * */
     removeEvent: (eventName: string) => void;
+    /*
+     * 获取滚动区域尺寸
+     * */
+    getScrollSize: () => CTable.size;
   }
   /*
    * 滚动条
@@ -118,5 +125,9 @@ declare namespace CTable {
      * 移除事件
      * */
     removeEvent: (eventName: string) => void;
+    /*
+     * 获取滚动尺寸
+     * */
+    getScrollSize: () => number;
   }
 }

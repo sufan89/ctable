@@ -39,4 +39,59 @@ declare namespace CTable {
   type eventObject = {
     [eventName: string]: callbackList;
   };
+  type cursorType =
+    | "default"
+    | "pointer"
+    | "progress"
+    | "wait"
+    | "cell"
+    | "crosshair"
+    | "text"
+    | "vertical-text"
+    | "alias"
+    | "copy"
+    | "move"
+    | "no-drop"
+    | "not-allowed"
+    | "grab"
+    | "grabbing"
+    | "all-scroll"
+    | "col-resize"
+    | "row-resize"
+    | "n-resize"
+    | "e-resize"
+    | "s-resize"
+    | "w-resize"
+    | "ne-resize"
+    | "nw-resize"
+    | "se-resize"
+    | "sw-resize"
+    | "ew-resize"
+    | "ns-resize"
+    | "nesw-resize"
+    | "nwse-resize"
+    | "zoom-in"
+    | "zoom-out";
+  /*
+   * 表格事件
+   * */
+  interface ITableEvent {
+    ctx: CTable.ITable;
+    eventObj: CTable.IEventBus;
+    pressKeyCode: string;
+    isMouseIn: boolean;
+    mouseButton: {
+      button: number;
+      buttons: number;
+    };
+    mouseCursor: cursorType;
+    /*
+     * 添加事件
+     * */
+    on: (eventName: string, callBack: Function, callOnce?: boolean) => void;
+    /*
+     * 移除事件
+     * */
+    removeEvent: (eventName: string) => void;
+  }
 }

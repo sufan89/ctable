@@ -12,7 +12,6 @@ const tableConfig: CTable.TableConfig = {
       label: "注册名称",
       prop: "companyName",
       align: "start",
-      // width: "180",
     },
     {
       label: "公司编码",
@@ -110,7 +109,7 @@ onMounted(() => {
   /*
    * 初始化1千条数据进行渲染
    * */
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 10000; i++) {
     let item = {};
     if (i === 0) {
       item = {

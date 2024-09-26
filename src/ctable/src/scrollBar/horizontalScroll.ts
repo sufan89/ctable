@@ -51,7 +51,11 @@ class horizontalScrollClass implements CTable.IBar {
       });
     }
   }
-  setPosition(position: number): void {}
+  setPosition(position: number): void {
+    if (this.barElement) {
+      this.barElement.scrollLeft = position;
+    }
+  }
 
   setBarContentSize(val: number): void {
     this.barContentElement.style.width = `${val}px`;
@@ -87,6 +91,12 @@ class horizontalScrollClass implements CTable.IBar {
    * */
   removeEvent(eventName: string) {
     this.scrollEvent.clearEvent(eventName);
+  }
+  /*
+   * 获取滚动区域大小
+   * */
+  getScrollSize(): number {
+    return this.barElement.scrollWidth;
   }
 }
 export default horizontalScrollClass;

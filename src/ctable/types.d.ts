@@ -2,42 +2,50 @@ declare namespace CTable {
   /*
    * 表格配置
    * */
-  export type TableConfig = {
+  export interface TableConfig {
     /*
      * 表格列配置信息
      * */
-    Columns: Array<ColumnConfig>;
+    Columns: Array<CTable.ColumnConfig>;
     /*
      * 表头行样式
+     *  (headConfig: Array<CTable.ColumnConfig>) => CTable.IRowStyle
      * */
-    headRowStyle?: (headConfig: Array<ColumnConfig>) => IRowStyle;
+    headRowStyle?: CTable.IRowStyle | Function;
     /*
      * 表头单元格样式
+     *  (headConfig: CTable.ColumnConfig) => CTable.ICellStyle
      * */
-    headCellStyle?: (headConfig: ColumnConfig) => ICellStyle;
+    headCellStyle?: CTable.ICellStyle | Function;
     /*
      * 单元格样式
-     * */
-    rowCellStyle?: (
-      row: rowValueType,
-      column: ColumnConfig,
+     * (
+      row: CTable.rowValueType,
+      column: CTable.ColumnConfig,
       rowIndex: number,
       columnIndex: number
-    ) => ICellStyle;
+    ) => CTable.ICellStyle;
+     * */
+    rowCellStyle?: CTable.ICellStyle | Function;
     /*
      * 表格行样式
-     * */
-    rowStyle?: (row: rowValueType, rowIndex: number) => IRowStyle;
+     * (row: CTable.rowValueType, rowIndex: number) => CTable.IRowStyle
+     */
+    rowStyle?: CTable.IRowStyle | Function;
     /*
      * 字体类型
      * */
-    baseFont?: baseFont;
+    baseFont?: CTable.baseFont;
     /*
      * 显示边框
      * 默认显示边框
      * */
     showBorder?: boolean;
-  };
+    /*
+     * 滚轮速率
+     * */
+    wheelSpeed?: number;
+  }
   /*
    * 表格列配置
    * */
@@ -99,5 +107,20 @@ declare namespace CTable {
     tableHeader: CTable.IRow;
     tableStyle: CTable.ITableStyle;
     tableScrollBar: CTable.IScrollBar;
+    tableEvent: CTable.IEventBus;
+    viewSize: CTable.size;
+    offsetInfo: {
+      scrollTop: number;
+      scrollLeft: number;
+    };
+    wheelSpeed: number;
+    /*
+     * 添加事件
+     * */
+    on: (eventName: string, callBack: Function, callOnce?: boolean) => void;
+    /*
+     * 移除事件
+     * */
+    removeEvent: (eventName: string) => void;
   }
 }
