@@ -33,6 +33,14 @@ declare namespace CTable {
     setRowHeight: Function;
     // 表头大小
     headerSize: CTable.size;
+    /*
+     * 获取单元格值
+     * */
+    getCellValue: () => CTable.cellValueType;
+    /*
+     * 禁用状态
+     * */
+    disabled: boolean;
   }
   /*
    * 位置

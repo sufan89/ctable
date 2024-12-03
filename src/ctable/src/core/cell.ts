@@ -13,6 +13,7 @@ class CellClass implements CTable.ICell {
   public columnInfo: CTable.ColumnConfig;
   public rowHeight: number;
   public headerSize: CTable.size;
+  disabled: boolean;
   /**
    * canvas上下文
    */
@@ -37,6 +38,11 @@ class CellClass implements CTable.ICell {
       width: 0,
       height: 0,
     };
+    this.disabled = false;
+  }
+
+  getCellValue(): CTable.cellValueType {
+    return this.realVal;
   }
   /*
    * 渲染一个单元格
@@ -164,6 +170,12 @@ class CellClass implements CTable.ICell {
     return this.cellSize.height < this.rowHeight
       ? this.rowHeight
       : this.cellSize.height;
+  }
+  /*
+   * 设置单元编辑状态
+   * */
+  setDisabled(val: boolean) {
+    this.disabled = val;
   }
 }
 export default CellClass;

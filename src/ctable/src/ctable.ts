@@ -82,6 +82,7 @@ class tableClass implements CTable.ITable {
    * 表格事件，处理表格事件相关
    * */
   tableEventObj: CTable.ITableEvent;
+
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -145,6 +146,7 @@ class tableClass implements CTable.ITable {
     // 初始化
     this.init();
   }
+
   /**
    * 根据配置进行初始化
    */
@@ -163,6 +165,7 @@ class tableClass implements CTable.ITable {
       height: this.tableElement.height - this.tableHeader.rowHeight,
     });
   }
+
   /*
    * 根据父节点内容，改变画布大小
    * */
@@ -176,10 +179,12 @@ class tableClass implements CTable.ITable {
     };
     this.tableScrollBar.setViewSize(this.viewSize);
   }
+
   /*
    * 重新渲染-刷新
    * */
   public reRender() {}
+
   /*
    * 渲染表格数据
    * @param tableData 表格数据
@@ -188,6 +193,7 @@ class tableClass implements CTable.ITable {
     this.offsetInfo = { scrollTop: 0, scrollLeft: 0 };
     this.initTableBody(tableData);
   }
+
   /*
    * 初始化表格行
    * */
@@ -226,6 +232,7 @@ class tableClass implements CTable.ITable {
       height: bodyHeight,
     });
   }
+
   /*
    * 平铺表格列
    * */
@@ -239,6 +246,7 @@ class tableClass implements CTable.ITable {
       }
     });
   }
+
   /*
    * 滚动条事件
    * */
@@ -252,6 +260,7 @@ class tableClass implements CTable.ITable {
     // 偏移进行绘制
     this.offsetRender({ scrollTop, scrollLeft });
   }
+
   /*
    * 偏移渲染
    * */
@@ -280,6 +289,7 @@ class tableClass implements CTable.ITable {
     // 最后绘制表头
     this.tableHeader.renderRow(this, -scrollLeft);
   }
+
   /*
    * 添加事件
    * */
@@ -290,6 +300,7 @@ class tableClass implements CTable.ITable {
       this.tableEvent.subscribe(eventName, callBack);
     }
   }
+
   /*
    * 移除事件
    * */

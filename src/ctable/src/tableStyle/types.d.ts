@@ -38,6 +38,10 @@ declare namespace CTable {
      * 获取字体配置
      * */
     getFont: () => string;
+    /*
+     * 勾选框相关配置
+     * */
+    checkBoxStyle: CTable.CheckBoxStyle;
   }
   /*
    * 行样式
@@ -47,6 +51,7 @@ declare namespace CTable {
     rowPadding: padding;
     rowBorder: border;
     rowFill: fillStyle;
+    checkBoxStyle: CTable.CheckBoxStyle;
   }
   /*
    * 基本字体配置

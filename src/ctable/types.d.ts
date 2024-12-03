@@ -57,7 +57,7 @@ declare namespace CTable {
     /*
      * 列标题
      * */
-    label: string;
+    label?: string;
     /*
      * 列宽,为空的话，则根据内容进行计算，设置之后如果当前宽度小于内容宽度，则根据内容宽度进行拉伸；保证列文本能平铺
      * */
@@ -98,6 +98,41 @@ declare namespace CTable {
      * 默认是false
      * */
     showToolTip?: true | false;
+    /*
+     * 勾选框相关配置
+     * */
+    checkBoxConfig?: CheckBoxStyle | GetCheckBoxStyle;
+    /*
+     * 是否可以进行编辑
+     * */
+    headCellDisabled?: boolean | Function;
+    /*
+     * 行单元格是否可以编辑
+     * */
+    rowCellDisabled?: boolean | Function;
+  };
+  /*
+   * CheckBox样式类型
+   * */
+  export type CheckBoxStyle = {
+    // 勾选宽大小
+    size: number;
+    // 勾选框背景颜色
+    backGround: string;
+    // 边框颜色
+    borderColor: string;
+    // 边框宽度
+    borderWidth: number;
+    // 禁用状态背景颜色
+    disabledColor: string;
+    // 禁用状态勾选颜色
+    disabledCheckedColor: string;
+  };
+  /*
+   * 获取CheckBoxStyle
+   * */
+  export type GetCheckBoxStyle = {
+    (): CheckBoxStyle;
   };
   export interface ITable {
     parentElement: HTMLElement | null;

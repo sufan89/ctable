@@ -7,11 +7,13 @@ class CellStyleClass implements ICellStyle {
   cellFont: CTable.baseFont;
   cellKey: string;
   cellPadding: CTable.padding;
+  checkBoxStyle: CTable.CheckBoxStyle;
   constructor(rowStyle: CTable.IRowStyle, colConfig: CTable.ColumnConfig) {
     this.cellBorder = { ...rowStyle.rowBorder };
     this.cellFill = { ...rowStyle.rowFill };
     this.cellFont = { ...rowStyle.rowFont };
     this.cellPadding = { ...rowStyle.rowPadding };
+    this.checkBoxStyle = { ...rowStyle.checkBoxStyle };
     // 生成单元格唯一KEY
     this.cellKey = Guid.create().toString();
   }

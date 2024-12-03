@@ -9,6 +9,10 @@ let myTable = null;
 const tableConfig: CTable.TableConfig = {
   Columns: [
     {
+      cellType: "checkbox",
+      prop: "rowSelect",
+    },
+    {
       label: "注册名称",
       prop: "companyName",
       align: "start",

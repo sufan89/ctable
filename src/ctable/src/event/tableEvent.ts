@@ -89,7 +89,6 @@ class TableEventClass implements CTable.ITableEvent {
    * */
   onWheel(event: WheelEvent) {
     const { shiftKey, deltaY } = event;
-    console.log(deltaY, "11");
     const { scrollTop, scrollLeft } = this.ctx.offsetInfo;
     const { width, height } = this.ctx.viewSize;
     const tableSize: CTable.size = this.ctx.tableScrollBar.getScrollSize();
