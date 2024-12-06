@@ -140,5 +140,13 @@ class checkBoxCell extends cellClass {
       indeterminate: this.indeterminate,
     };
   }
+  /*
+   * 设置选中值
+   * */
+  setCheckValue(checked: boolean, indeterminate: boolean) {
+    this.checked = checked;
+    this.indeterminate = indeterminate;
+    this.renderCell();
+  }
 }
 export default checkBoxCell;

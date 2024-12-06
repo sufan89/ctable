@@ -11,6 +11,7 @@ const tableConfig: CTable.TableConfig = {
     {
       cellType: "checkbox",
       prop: "rowSelect",
+      fixed: "left",
     },
     {
       label: "注册名称",
@@ -101,10 +102,11 @@ const tableConfig: CTable.TableConfig = {
       width: "180",
     },
     {
-      label: "更新时间",
+      label: "更新时间1",
       prop: "updatedTime",
       align: "right",
       width: "180",
+      fixed: "right",
     },
   ],
 };

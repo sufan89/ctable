@@ -37,27 +37,52 @@ class rowClass implements CTable.IRow {
   ) {
     let { x, y, width } = bbox;
     if (cells && cells.length > 0) {
-      cells.forEach((cell) => {
-        // 为固定列
-        if (cell.columnInfo.fixed && cell.columnInfo.fixed === "right") {
-          cell.cellPosition = { x: width, y: y };
-          width = width - cell.cellSize.height;
-        } else {
-          cell.cellPosition = { x: x, y: y };
+      // 右固定列信息
+      const rightCells: Array<CTable.ICell> = cells.filter(
+        (c) => c.columnInfo.fixed && c.columnInfo.fixed === "right"
+      );
+      // 左固定列信息
+      const leftCells: Array<CTable.ICell> = cells.filter(
+        (c) => c.columnInfo.fixed && c.columnInfo.fixed === "left"
+      );
+      // 不固定列信息
+      const unFixedCells: Array<CTable.ICell> = cells.filter(
+        (c) => c.columnInfo.fixed === undefined
+      );
+      let leftPosition: number = 0;
+      let rightPosition: number = width;
+      // 计算左固定列位置，
+      if (leftCells.length > 0) {
+        leftCells.forEach((cell) => {
+          cell.cellPosition = { x: leftPosition, y: y };
+          leftPosition = cell.cellSize.width + leftPosition;
+        });
+      }
+      // 计算右固定列位置
+      if (rightCells.length > 0) {
+        rightCells.forEach((cell) => {
+          rightPosition = rightPosition - cell.cellSize.width;
+          cell.cellPosition = { x: rightPosition, y: y };
+        });
+      }
+      // 技术不固定列位置
+      if (unFixedCells.length > 0) {
+        unFixedCells.forEach((cell) => {
+          cell.cellPosition = { x: leftPosition + x, y: y };
           x = x + cell.cellSize.width;
-        }
-        if (cell.children && cell.children.length > 0) {
-          this.calcRowCellPosition(
-            {
-              x: cell.cellPosition.x,
-              y: cell.cellSize.height,
-              width: cell.cellSize.width,
-              height: cell.cellSize.height,
-            },
-            cell.children
-          );
-        }
-      });
+          if (cell.children && cell.children.length > 0) {
+            this.calcRowCellPosition(
+              {
+                x: cell.cellPosition.x,
+                y: cell.cellSize.height,
+                width: cell.cellSize.width,
+                height: cell.cellSize.height,
+              },
+              cell.children
+            );
+          }
+        });
+      }
     }
   }
   /*

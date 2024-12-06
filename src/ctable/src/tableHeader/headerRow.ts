@@ -81,7 +81,13 @@ class tableHeader extends rowClass {
   ): Array<CTable.ICell> {
     const cellList = new Array<CTable.ICell>();
     if (colConfig && colConfig.length > 0) {
-      colConfig.forEach((col) => {
+      // 处理列，如果有固定列，则将左固定列排到前面，右固定列排到后面
+      const cols: Array<CTable.ColumnConfig> = [
+        ...colConfig.filter((t) => t.fixed && t.fixed === "left"),
+        ...colConfig.filter((t) => t.fixed === undefined),
+        ...colConfig.filter((t) => t.fixed && t.fixed === "right"),
+      ];
+      cols.forEach((col) => {
         const cell = this.getHeadCell(col);
         if (col.children && col.children.length > 0) {
           cell.children?.push(...this.generateHeadCells(col.children));
@@ -102,13 +108,31 @@ class tableHeader extends rowClass {
       {
         x: x,
         y: 0,
-        width: context.canvasSize.width,
-        height: context.canvasSize.height,
+        width: context.viewSize.width,
+        height: context.viewSize.height,
       },
       this.rowCells
     );
     if (this.rowCells && this.rowCells.length > 0) {
-      this.rowCells.forEach((cell) => {
+      const leftCells = this.rowCells.filter(
+        (t) => t.columnInfo.fixed && t.columnInfo.fixed === "left"
+      );
+      const rightCells = this.rowCells.filter(
+        (t) => t.columnInfo.fixed && t.columnInfo.fixed === "right"
+      );
+      const unFixedCells = this.rowCells.filter(
+        (t) => t.columnInfo.fixed === undefined
+      );
+      // 先渲染未固定
+      unFixedCells.forEach((cell) => {
+        this.renderCell(cell);
+      });
+      // 渲染左固定
+      leftCells.forEach((cell) => {
+        this.renderCell(cell);
+      });
+      // 渲染右固定
+      rightCells.forEach((cell) => {
         this.renderCell(cell);
       });
     }

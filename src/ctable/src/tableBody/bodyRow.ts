@@ -68,9 +68,18 @@ class bodyRow extends rowClass {
    * 渲染行
    * */
   renderRow() {
-    this.rowCells.forEach((cell) => {
-      cell.renderCell();
-    });
+    // 先渲染未固定列
+    this.rowCells
+      .filter((c) => c.columnInfo.fixed === undefined)
+      .forEach((cell) => {
+        cell.renderCell();
+      });
+    // 渲染固定列
+    this.rowCells
+      .filter((c) => c.columnInfo.fixed)
+      .forEach((cell) => {
+        cell.renderCell();
+      });
   }
   /*
    * 生成行单元格
@@ -139,15 +148,29 @@ class bodyRow extends rowClass {
   }) {
     let { x, y, width } = bbox;
     if (this.rowCells && this.rowCells.length > 0) {
-      this.rowCells.forEach((cell) => {
-        // 为固定列
-        if (cell.columnInfo.fixed && cell.columnInfo.fixed === "right") {
-          cell.cellPosition = { x: width, y: y };
-          width = width - cell.cellSize.width;
-        } else {
-          cell.cellPosition = { x: x, y: y };
-          x = x + cell.cellSize.width;
-        }
+      const rightCells = this.rowCells.filter(
+        (t) => t.columnInfo.fixed && t.columnInfo.fixed === "right"
+      );
+      const leftCells = this.rowCells.filter(
+        (c) => c.columnInfo.fixed && c.columnInfo.fixed === "left"
+      );
+      const unFixedCells = this.rowCells.filter(
+        (c) => c.columnInfo.fixed === undefined
+      );
+      let leftPosition: number = 0;
+      let rightPosition: number = width;
+      // 计算左固定单元格位置
+      leftCells.forEach((cell) => {
+        cell.cellPosition = { x: leftPosition, y: y };
+        leftPosition = cell.cellSize.width + leftPosition;
+      });
+      rightCells.forEach((cell) => {
+        rightPosition = rightPosition - cell.cellSize.width;
+        cell.cellPosition = { x: rightPosition, y: y };
+      });
+      unFixedCells.forEach((cell) => {
+        cell.cellPosition = { x: leftPosition + x, y: y };
+        x = x + cell.cellSize.width;
       });
     }
   }
