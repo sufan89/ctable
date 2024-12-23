@@ -4,6 +4,7 @@ class rowStyleClass implements CTable.IRowStyle {
   rowFont: CTable.baseFont;
   rowPadding: CTable.padding;
   checkBoxStyle: CTable.CheckBoxStyle;
+  selectedStyle: { fill: CTable.fillStyle; border: CTable.border };
   constructor(tableStyle: CTable.ITableStyle) {
     this.rowFont = { ...tableStyle.baseFont };
     // 给默认值
@@ -28,6 +29,15 @@ class rowStyleClass implements CTable.IRowStyle {
       disabledColor: "#edf2fc",
       disabledCheckedColor: "#c0c4cc",
     };
+    this.selectedStyle = {
+      fill: {
+        color: "#fafafa",
+      },
+      border: {
+        width: 1,
+        color: "#e8eaec",
+      },
+    };
   }
   /*
    * 获取表格渲染行样式
@@ -39,6 +49,7 @@ class rowStyleClass implements CTable.IRowStyle {
       rowPadding: this.rowPadding,
       rowFont: this.rowFont,
       checkBoxStyle: this.checkBoxStyle,
+      selectedStyle: this.selectedStyle,
     };
   }
 }

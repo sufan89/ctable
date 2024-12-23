@@ -25,7 +25,11 @@ class TableStyleClass implements CTable.ITableStyle {
       };
     }
     this.headerRowStyle = new headerRowStyle(tableConfig, this);
-    this.tableRowStyle = new tableRowStyle(tableConfig, this);
+    this.tableRowStyle = new tableRowStyle(
+      tableConfig.rowStyle,
+      tableConfig.Columns,
+      this
+    );
   }
 }
 export default TableStyleClass;

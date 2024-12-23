@@ -1,5 +1,5 @@
 declare namespace CTable {
-  interface IEventBus {
+  export interface IEventBus {
     /*
      * 事件发布
      * */
@@ -39,6 +39,9 @@ declare namespace CTable {
   type eventObject = {
     [eventName: string]: callbackList;
   };
+  /*
+   * 鼠标光标类型
+   * */
   type cursorType =
     | "default"
     | "pointer"
@@ -75,7 +78,7 @@ declare namespace CTable {
   /*
    * 表格事件
    * */
-  interface ITableEvent {
+  export interface ITableEvent {
     ctx: CTable.ITable;
     eventObj: CTable.IEventBus;
     pressKeyCode: string;
@@ -94,4 +97,12 @@ declare namespace CTable {
      * */
     removeEvent: (eventName: string) => void;
   }
+  /*
+   * 鼠标移入时，鼠标指针当前的数据信息
+   * */
+  export type MouseOverInfo = {
+    currentRow: CTable.IRow | null;
+    currentCell: CTable.ICell | null;
+    isHeader: Boolean;
+  };
 }

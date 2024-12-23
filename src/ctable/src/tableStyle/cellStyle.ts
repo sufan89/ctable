@@ -8,12 +8,45 @@ class CellStyleClass implements ICellStyle {
   cellKey: string;
   cellPadding: CTable.padding;
   checkBoxStyle: CTable.CheckBoxStyle;
-  constructor(rowStyle: CTable.IRowStyle, colConfig: CTable.ColumnConfig) {
-    this.cellBorder = { ...rowStyle.rowBorder };
-    this.cellFill = { ...rowStyle.rowFill };
-    this.cellFont = { ...rowStyle.rowFont };
-    this.cellPadding = { ...rowStyle.rowPadding };
-    this.checkBoxStyle = { ...rowStyle.checkBoxStyle };
+  selectStyle: { cellFill: CTable.fillStyle; cellBorder: CTable.border };
+  constructor(
+    rowStyle: CTable.IRowStyle,
+    colConfig: CTable.ColumnConfig,
+    cellValue: CTable.cellValueType
+  ) {
+    const { cellStyle } = colConfig;
+    let styleInfo: CTable.ICellStyle | null = null;
+    if (cellStyle && typeof cellStyle === "function") {
+      styleInfo = cellStyle(colConfig, cellValue);
+    } else if (cellStyle) {
+      styleInfo = cellStyle;
+    }
+    if (styleInfo) {
+      const {
+        cellBorder,
+        cellFill,
+        cellFont,
+        cellPadding,
+        checkBoxStyle,
+        selectStyle,
+      } = styleInfo;
+      this.cellBorder = cellBorder || rowStyle.rowBorder;
+      this.cellFill = cellFill || rowStyle.rowFill;
+      this.cellFont = cellFont || rowStyle.rowFont;
+      this.cellPadding = cellPadding || rowStyle.rowPadding;
+      this.checkBoxStyle = checkBoxStyle || rowStyle.checkBoxStyle;
+      this.selectStyle = selectStyle || rowStyle.selectedStyle;
+    } else {
+      this.cellBorder = { ...rowStyle.rowBorder };
+      this.cellFill = { ...rowStyle.rowFill };
+      this.cellFont = { ...rowStyle.rowFont };
+      this.cellPadding = { ...rowStyle.rowPadding };
+      this.checkBoxStyle = { ...rowStyle.checkBoxStyle };
+      this.selectStyle = {
+        cellFill: rowStyle.selectedStyle.fill,
+        cellBorder: rowStyle.selectedStyle.border,
+      };
+    }
     // 生成单元格唯一KEY
     this.cellKey = Guid.create().toString();
   }

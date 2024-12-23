@@ -2,10 +2,12 @@ class rowClass implements CTable.IRow {
   rowCells: Array<CTable.ICell>;
   rowHeight: number;
   rowStyle: CTable.IRowStyle;
+  isMouseSelect: boolean;
   constructor(ctx: CanvasRenderingContext2D, rowStyle: CTable.IRowStyle) {
     this.rowHeight = 0;
     this.rowCells = [];
     this.rowStyle = rowStyle;
+    this.isMouseSelect = false;
   }
   // eslint-disable-next-line no-unused-vars
   renderRow(context: CTable.ITable) {}
@@ -105,6 +107,18 @@ class rowClass implements CTable.IRow {
       width = r.cellSize.width + width;
     });
     return width;
+  }
+  /*
+   * 设置行是否被鼠标移动选中
+   * */
+  setMouseSelect(isSelect: boolean = false) {
+    this.rowCells.forEach((cell) => {
+      cell.isMouseSelectRow = isSelect;
+      if (!isSelect) {
+        // 如果未选中行，则将当前行所有单元格设置为鼠标未选中
+        cell.setMouseSelect(false);
+      }
+    });
   }
 }
 export default rowClass;

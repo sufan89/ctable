@@ -5,7 +5,7 @@ declare namespace CTable {
   /*
    * 单元格绘制接口
    * */
-  interface ICell {
+  export interface ICell {
     cellPosition: CTable.position;
     cellStyle: CTable.ICellStyle;
     cellKey: string;
@@ -41,6 +41,18 @@ declare namespace CTable {
      * 禁用状态
      * */
     disabled: boolean;
+    /*
+     * 当前行是否被鼠标选中
+     * */
+    isMouseSelectRow: boolean;
+    /*
+     * 当前单元格是否被鼠标选中
+     * */
+    isMouseSelect: boolean;
+    /*
+     * 设置当前单元格鼠标选中状态
+     * */
+    setMouseSelect: (isSelect: boolean) => void;
   }
   /*
    * 位置
@@ -68,9 +80,21 @@ declare namespace CTable {
    * 表格行接口
    * */
   export interface IRow {
-    rowCells: Array<ICell>;
+    /*
+     * 表格行下所有单元格信息
+     * */
+    rowCells: Array<CTable.ICell>;
+    /*
+     * 渲染行
+     * */
     renderRow: Function;
+    /*
+     * 行高
+     * */
     rowHeight: number;
+    /*
+     * 行样式
+     * */
     rowStyle: CTable.IRowStyle;
     renderCell: Function;
     /*
@@ -81,6 +105,15 @@ declare namespace CTable {
      * 计算当前行单元格尺寸
      * */
     calcRowCellPosition: Function;
+    /*
+     * 是否鼠标选中
+     * */
+    isMouseSelect: boolean;
+    /*
+     * 设置当前行选中状态
+     * */
+    // eslint-disable-next-line no-unused-vars
+    setMouseSelect: (isSelect: boolean) => void;
   }
   /*
    * 表格行数据类型

@@ -19,6 +19,10 @@ class TableEventClass implements CTable.ITableEvent {
    * 表格事件主体
    * */
   eventObj: CTable.IEventBus;
+  /*
+   * 鼠标移动是选中的数据
+   * */
+  mouseOverData: CTable.MouseOverInfo;
   constructor(context: CTable.ITable) {
     this.ctx = context;
     this.eventObj = new eventBus();
@@ -67,6 +71,11 @@ class TableEventClass implements CTable.ITableEvent {
         });
       }
     }
+    this.mouseOverData = {
+      currentRow: null,
+      currentCell: null,
+      isHeader: false,
+    };
   }
 
   on(
@@ -143,21 +152,40 @@ class TableEventClass implements CTable.ITableEvent {
   onMouseLeave(e: MouseEvent) {
     this.isMouseIn = false;
     this.mouseButton = { button: 0, buttons: 0 };
+    // 鼠标移出之后，需要清空鼠标移动选中数据
+    this.mouseOverData = {
+      currentRow: null,
+      currentCell: null,
+      isHeader: false,
+    };
     this.changeMousePoint();
   }
   /*
    * 鼠标移动事件
    * */
   onMouseMove(e: MouseEvent) {
-    const { movementX, movementY } = e;
+    const { movementX, movementY, offsetX, offsetY } = e;
     // 往上、往右是负数
     if (this.mouseCursor === "grabbing") {
       // 拖动画布
       this.dragCanvas(movementX, movementY);
+    } else if (this.isMouseIn) {
+      // 计算当前鼠标移动位置在哪行数据，哪个单元格
+      this.mouseOverData = this.getMousePointInfo(offsetX, offsetY);
+      // 高亮当前鼠标移动选中数据
+      if (!this.mouseOverData.isHeader) {
+        // 先将所有当前绘制的数据，置为false
+        this.ctx.viewRows.forEach((row) => {
+          row.setMouseSelect(false);
+        });
+        this.mouseOverData.currentRow?.setMouseSelect(true);
+        this.mouseOverData.currentCell?.setMouseSelect(true);
+        this.ctx.reRender();
+      }
     }
-    // 拖动表头宽度
-    // 拖动表头进行排序
-    // 拖动行进行排序
+    // todo 拖动表头宽度
+    // todo 拖动表头进行排序
+    // todo 拖动行进行排序
   }
   /*
    * 改变鼠标指针状态
@@ -223,9 +251,58 @@ class TableEventClass implements CTable.ITableEvent {
     const offsetTop = scrollTop + movementY * -1;
     offsetSize.scrollTop =
       offsetTop < 0 ? 0 : offsetTop > maxHeight ? maxHeight : offsetTop;
-
     // 修改滚动条位置
     this.ctx.tableScrollBar.setBarPosition(offsetSize);
+  }
+  /*
+   * 获取当前鼠标移动的点属于哪个行，哪个单元格
+   * */
+  getMousePointInfo(offsetX: number, offsetY: number): CTable.MouseOverInfo {
+    const data: CTable.MouseOverInfo = {
+      currentRow: null,
+      currentCell: null,
+      isHeader: false,
+    };
+    // 获取鼠标指针当前所在行信息
+    const { rowHeight } = this.ctx.tableHeader;
+    if (offsetY < rowHeight) {
+      // 当前鼠标位置是在表头
+      data.isHeader = true;
+      // 计算当前在表头哪个单元格
+      data.currentRow = this.ctx.tableHeader;
+    } else {
+      // 当前鼠标指针位置，不在表头，在表格上
+      data.isHeader = false;
+      // 找到当前行
+      for (let index = 0; index < this.ctx.viewRows.length; index++) {
+        const currentRow = this.ctx.viewRows[index];
+        const firstCell = currentRow.rowCells[0];
+        if (
+          offsetY >= firstCell.cellPosition.y - currentRow.rowHeight &&
+          offsetY < currentRow.rowHeight + firstCell.cellPosition.y
+        ) {
+          data.currentRow = currentRow;
+          break;
+        }
+      }
+    }
+    // 获取鼠标指针当前所在的单元格信息
+    if (data.currentRow) {
+      const { rowCells } = data.currentRow;
+      for (let index = 0; index < rowCells.length; index++) {
+        const cell = rowCells[index];
+        if (
+          offsetX > cell.cellPosition.x &&
+          offsetX <= cell.cellPosition.x + cell.cellSize.width
+        ) {
+          data.currentCell = cell;
+          break;
+        } else {
+          data.currentCell = cell;
+        }
+      }
+    }
+    return data;
   }
 }
 export default TableEventClass;

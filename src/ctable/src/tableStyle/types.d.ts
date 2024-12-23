@@ -7,9 +7,16 @@ declare namespace CTable {
      * 总的字体类型
      * */
     baseFont: baseFont;
+    /*
+     * 表头样式
+     * */
     headerRowStyle: CTable.IRowStyle;
+    /*
+     * 表格行样式
+     * */
     tableRowStyle: CTable.IRowStyle;
   }
+
   /*
    * 单元格样式配置
    * */
@@ -42,7 +49,15 @@ declare namespace CTable {
      * 勾选框相关配置
      * */
     checkBoxStyle: CTable.CheckBoxStyle;
+    /*
+     * 选中时单元格样式
+     * */
+    selectStyle: {
+      cellFill: CTable.fillStyle;
+      cellBorder: CTable.border;
+    };
   }
+
   /*
    * 行样式
    * */
@@ -52,7 +67,12 @@ declare namespace CTable {
     rowBorder: border;
     rowFill: fillStyle;
     checkBoxStyle: CTable.CheckBoxStyle;
+    selectedStyle: {
+      fill: fillStyle;
+      border: border;
+    };
   }
+
   /*
    * 基本字体配置
    * */

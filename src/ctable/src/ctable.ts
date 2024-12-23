@@ -8,6 +8,7 @@ import bodyRow from "./tableBody";
 import scrollBarClass from "./scrollBar";
 import eventBus from "./event/event";
 import TableEventClass from "./event/tableEvent";
+import tableRowStyle from "@/ctable/src/tableStyle/tableRowStyle";
 
 class tableClass implements CTable.ITable {
   /**
@@ -82,7 +83,10 @@ class tableClass implements CTable.ITable {
    * 表格事件，处理表格事件相关
    * */
   tableEventObj: CTable.ITableEvent;
-
+  /*
+   * 当前渲染的行数据
+   * */
+  viewRows: Array<CTable.IRow> = [];
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -146,7 +150,6 @@ class tableClass implements CTable.ITable {
     // 初始化
     this.init();
   }
-
   /**
    * 根据配置进行初始化
    */
@@ -165,7 +168,6 @@ class tableClass implements CTable.ITable {
       height: this.tableElement.height - this.tableHeader.rowHeight,
     });
   }
-
   /*
    * 根据父节点内容，改变画布大小
    * */
@@ -179,12 +181,19 @@ class tableClass implements CTable.ITable {
     };
     this.tableScrollBar.setViewSize(this.viewSize);
   }
-
   /*
    * 重新渲染-刷新
    * */
-  public reRender() {}
-
+  public reRender() {
+    if (this.viewRows && this.viewRows.length > 0) {
+      this.viewRows.forEach((r) => {
+        r.renderRow();
+      });
+      this.tableHeader.renderRow(this, -this.offsetInfo.scrollLeft);
+    } else {
+      this.offsetRender(this.offsetInfo);
+    }
+  }
   /*
    * 渲染表格数据
    * @param tableData 表格数据
@@ -193,12 +202,12 @@ class tableClass implements CTable.ITable {
     this.offsetInfo = { scrollTop: 0, scrollLeft: 0 };
     this.initTableBody(tableData);
   }
-
   /*
    * 初始化表格行
    * */
   initTableBody(tableData: Array<CTable.rowValueType>) {
     this.tableBody = [];
+    this.viewRows = [];
     // 表头高度
     let offsetHeight = this.tableHeader.rowHeight;
     let bodyHeight: number = 0;
@@ -207,7 +216,7 @@ class tableClass implements CTable.ITable {
         const row = new bodyRow(
           this.ctx,
           this.tableColumns,
-          this.tableStyle.tableRowStyle,
+          new tableRowStyle(this.tableConfig.rowStyle, d, this.tableStyle),
           d
         );
         row.calcRowSize();
@@ -223,6 +232,7 @@ class tableClass implements CTable.ITable {
         // 多渲染一行
         if (offsetHeight - row.rowHeight < this.viewSize.height) {
           row.renderRow();
+          this.viewRows.push(row);
         }
         this.tableBody.push(row);
       }
@@ -232,7 +242,6 @@ class tableClass implements CTable.ITable {
       height: bodyHeight,
     });
   }
-
   /*
    * 平铺表格列
    * */
@@ -246,7 +255,6 @@ class tableClass implements CTable.ITable {
       }
     });
   }
-
   /*
    * 滚动条事件
    * */
@@ -260,13 +268,13 @@ class tableClass implements CTable.ITable {
     // 偏移进行绘制
     this.offsetRender({ scrollTop, scrollLeft });
   }
-
   /*
    * 偏移渲染
    * */
   offsetRender(data: { scrollTop: number; scrollLeft: number }) {
     const { scrollTop = 0, scrollLeft = 0 } = data;
     this.offsetInfo = data;
+    this.viewRows = [];
     //  清空绘制区域
     this.ctx?.clearRect(0, 0, this.viewSize.width, this.viewSize.height);
     // 绘制表格区域
@@ -282,6 +290,7 @@ class tableClass implements CTable.ITable {
       offsetHeight = offsetHeight + bodyRow.rowHeight;
       if (offsetHeight - bodyRow.rowHeight < this.viewSize.height) {
         bodyRow.renderRow();
+        this.viewRows.push(bodyRow);
       } else {
         break;
       }
@@ -289,7 +298,6 @@ class tableClass implements CTable.ITable {
     // 最后绘制表头
     this.tableHeader.renderRow(this, -scrollLeft);
   }
-
   /*
    * 添加事件
    * */
@@ -300,7 +308,6 @@ class tableClass implements CTable.ITable {
       this.tableEvent.subscribe(eventName, callBack);
     }
   }
-
   /*
    * 移除事件
    * */

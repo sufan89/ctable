@@ -11,27 +11,17 @@ declare namespace CTable {
      * 表头行样式
      *  (headConfig: Array<CTable.ColumnConfig>) => CTable.IRowStyle
      * */
-    headRowStyle?: CTable.IRowStyle | Function;
+    headRowStyle?: CTable.IRowStyle | CTable.GetHeaderRowStyle;
     /*
      * 表头单元格样式
      *  (headConfig: CTable.ColumnConfig) => CTable.ICellStyle
      * */
-    headCellStyle?: CTable.ICellStyle | Function;
-    /*
-     * 单元格样式
-     * (
-      row: CTable.rowValueType,
-      column: CTable.ColumnConfig,
-      rowIndex: number,
-      columnIndex: number
-    ) => CTable.ICellStyle;
-     * */
-    rowCellStyle?: CTable.ICellStyle | Function;
+    headCellStyle?: CTable.ICellStyle | CTable.GetHeaderCellStyle;
     /*
      * 表格行样式
      * (row: CTable.rowValueType, rowIndex: number) => CTable.IRowStyle
      */
-    rowStyle?: CTable.IRowStyle | Function;
+    rowStyle?: CTable.IRowStyle | CTable.GetRowStyle;
     /*
      * 字体类型
      * */
@@ -46,6 +36,7 @@ declare namespace CTable {
      * */
     wheelSpeed?: number;
   }
+
   /*
    * 表格列配置
    * */
@@ -110,6 +101,19 @@ declare namespace CTable {
      * 行单元格是否可以编辑
      * */
     rowCellDisabled?: boolean | Function;
+    /*
+     * 但愿格样式
+     * */
+    cellStyle?: CTable.ICellStyle | CTable.GetCellStyle;
+  };
+  /*
+   * 获取单元格样式
+   * */
+  export type GetCellStyle = {
+    (
+      columnInfo: CTable.ColumnConfig,
+      cellValue: CTable.cellValueType
+    ): CTable.ICellStyle;
   };
   /*
    * CheckBox样式类型
@@ -134,6 +138,37 @@ declare namespace CTable {
   export type GetCheckBoxStyle = {
     (): CheckBoxStyle;
   };
+  /*
+   * 获取表格行样式
+   * */
+  export type GetRowStyle = {
+    (rowValue: CTable.rowValueType): CTable.IRowStyle;
+  };
+  /*
+   * 获取表格头样式
+   * */
+  export type GetHeaderRowStyle = {
+    (headerInfo: Array<CTable.ColumnConfig>): CTable.IRowStyle;
+  };
+  /*
+   * 获取表头单元格样式
+   * */
+  export type GetHeaderCellStyle = {
+    (colInfo: CTable.ColumnConfig): CTable.ICellStyle;
+  };
+  /*
+   * 表格事件名称
+   * */
+  export type TableEventName =
+    | "CellClick"
+    | "RowClick"
+    | "HeaderClick"
+    | "HeaderCellClick"
+    | "CellMouseEnter"
+    | "CellMouseLeave"
+    | "CellDoubleClick"
+    | "RowDoubleClick";
+
   export interface ITable {
     parentElement: HTMLElement | null;
     tableElement: HTMLCanvasElement | null;
@@ -148,6 +183,7 @@ declare namespace CTable {
       scrollTop: number;
       scrollLeft: number;
     };
+    reRender: Function;
     wheelSpeed: number;
     /*
      * 添加事件
@@ -157,5 +193,9 @@ declare namespace CTable {
      * 移除事件
      * */
     removeEvent: (eventName: string) => void;
+    /*
+     * 当前绘制的行数据
+     * */
+    viewRows: Array<CTable.IRow>;
   }
 }

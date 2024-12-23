@@ -13,6 +13,8 @@ class CellClass implements CTable.ICell {
   public columnInfo: CTable.ColumnConfig;
   public rowHeight: number;
   public headerSize: CTable.size;
+  isMouseSelectRow: boolean;
+  isMouseSelect: boolean;
   disabled: boolean;
   /**
    * canvas上下文
@@ -25,7 +27,7 @@ class CellClass implements CTable.ICell {
     colConfig: CTable.ColumnConfig,
     cellValue: CTable.cellValueType
   ) {
-    this.cellStyle = new CellStyleClass(s, colConfig);
+    this.cellStyle = new CellStyleClass(s, colConfig, cellValue);
     this.cellKey = Guid.create().toString();
     this.ctx = context;
     this.cellPosition = { x: 0, y: 0 };
@@ -39,6 +41,8 @@ class CellClass implements CTable.ICell {
       height: 0,
     };
     this.disabled = false;
+    this.isMouseSelectRow = false;
+    this.isMouseSelect = false;
   }
 
   getCellValue(): CTable.cellValueType {
@@ -76,7 +80,10 @@ class CellClass implements CTable.ICell {
         cellHeight
       );
     }
-    this.ctx.fillStyle = this.cellStyle.cellFill.color;
+    this.ctx.fillStyle =
+      this.isMouseSelectRow || this.isMouseSelect
+        ? this.cellStyle.selectStyle.cellFill.color
+        : this.cellStyle.cellFill.color;
     this.ctx.fillRect(
       this.cellPosition.x + this.cellStyle.cellBorder.width,
       this.cellPosition.y + this.cellStyle.cellBorder.width,
@@ -176,6 +183,12 @@ class CellClass implements CTable.ICell {
    * */
   setDisabled(val: boolean) {
     this.disabled = val;
+  }
+  /*
+   * 设置当前单元格被鼠标选中状态
+   * */
+  setMouseSelect(isSelect: boolean = false) {
+    this.isMouseSelect = isSelect;
   }
 }
 export default CellClass;
