@@ -83,19 +83,19 @@ declare namespace CTable {
     eventObj: CTable.IEventBus;
     pressKeyCode: string;
     isMouseIn: boolean;
-    mouseButton: {
-      button: number;
-      buttons: number;
-    };
     mouseCursor: cursorType;
     /*
      * 添加事件
      * */
-    on: (eventName: string, callBack: Function, callOnce?: boolean) => void;
+    on: (
+      eventName: CTable.TableEventName,
+      callBack: Function,
+      callOnce?: boolean
+    ) => void;
     /*
      * 移除事件
      * */
-    removeEvent: (eventName: string) => void;
+    removeEvent: (eventName: CTable.TableEventName) => void;
   }
   /*
    * 鼠标移入时，鼠标指针当前的数据信息
@@ -103,6 +103,6 @@ declare namespace CTable {
   export type MouseOverInfo = {
     currentRow: CTable.IRow | null;
     currentCell: CTable.ICell | null;
-    isHeader: Boolean;
+    isHeader: boolean;
   };
 }

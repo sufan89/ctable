@@ -38,8 +38,7 @@ class tableClass implements CTable.ITable {
   /*
    * 表头信息
    * */
-  // @ts-ignore
-  tableHeader: CTable.IRow;
+  tableHeader!: CTable.IRow;
   /*
    * 表格样式信息
    * */
@@ -72,14 +71,6 @@ class tableClass implements CTable.ITable {
     scrollLeft: number;
   };
   /*
-   * 当前按下键盘按钮code
-   * */
-  pressKeyCode: string;
-  /*
-   * 当前鼠标指针是否在画布内
-   * */
-  isMouseIn: boolean;
-  /*
    * 表格事件，处理表格事件相关
    * */
   tableEventObj: CTable.ITableEvent;
@@ -87,6 +78,10 @@ class tableClass implements CTable.ITable {
    * 当前渲染的行数据
    * */
   viewRows: Array<CTable.IRow> = [];
+  /*
+   * 当前的勾选行信息
+   * */
+  selectedRows!: Array<{ colKey: string; rows: Array<CTable.IRow> }>;
   /**
    * 构造函数
    * @param elm 表格容器元素ID
@@ -110,8 +105,6 @@ class tableClass implements CTable.ITable {
     } else {
       this.wheelSpeed = 0.5;
     }
-    this.pressKeyCode = "";
-    this.isMouseIn = false;
     this.offsetInfo = { scrollTop: 0, scrollLeft: 0 };
     // 初始化表格事件
     this.tableEvent = new eventBus();
@@ -139,6 +132,7 @@ class tableClass implements CTable.ITable {
       console.error("当前浏览器不支持canvas绘制");
       return;
     }
+    this.selectedRows = [];
     // 初始化表头
     this.tableHeader = new headerRow(
       this.ctx,
@@ -157,6 +151,12 @@ class tableClass implements CTable.ITable {
     this.tableHeader.renderRow(this);
     // 平铺表格列信息
     this.flatTableColumns(this.tableHeader.rowCells);
+    // 根据列，初始化选择行信息
+    this.tableColumns
+      .filter((t) => t.columnInfo.cellType === "checkbox")
+      .forEach((t) => {
+        this.selectedRows.push({ colKey: t.columnInfo.prop, rows: [] });
+      });
     // 设置滚动条宽度
     this.tableScrollBar.setTableSize({
       height: 0,
@@ -301,7 +301,7 @@ class tableClass implements CTable.ITable {
   /*
    * 添加事件
    * */
-  on(eventName: string, callBack: Function, callOnce?: boolean) {
+  on(eventName: CTable.TableEventName, callBack: Function, callOnce?: boolean) {
     if (callOnce) {
       this.tableEvent.subscribeOnce(eventName, callBack);
     } else {
@@ -311,8 +311,106 @@ class tableClass implements CTable.ITable {
   /*
    * 移除事件
    * */
-  removeEvent(eventName: string) {
+  removeEvent(eventName: CTable.TableEventName) {
     this.tableEvent.clearEvent(eventName);
+  }
+  /*
+   * 行选择框勾选事件
+   * */
+  rowCheckBoxChange(checkedCell: CTable.ICell, checkedRow: CTable.IRow) {
+    // 获取当前勾选框值信息
+    const cellValue: CTable.checkBoxValueType = checkedCell.getCellValue();
+    const cellCol: CTable.ColumnConfig = checkedCell.columnInfo;
+    const selectedInfo = this.selectedRows.find(
+      (t) => t.colKey === cellCol.prop
+    );
+    // 判断当前是否选中，
+    if (cellValue.checked) {
+      // 存在，则移除，并修改单元格选中状态
+      checkedCell.setCellValue({ checked: false, indeterminate: false });
+      const selectedRowIndex = selectedInfo?.rows.findIndex((t) =>
+        t.rowCells.find((c) => c.cellKey === checkedCell.cellKey)
+      );
+      if (selectedRowIndex !== undefined) {
+        selectedInfo?.rows.splice(selectedRowIndex, 1);
+      }
+    } else {
+      // 不存在，则添加到选中，并修改当前单元格选中状态
+      selectedInfo?.rows.push(checkedRow);
+      checkedCell.setCellValue({ checked: true, indeterminate: false });
+    }
+    // 向外透传选中变更事件
+    this.tableEvent.publish(
+      "SelectionChange",
+      checkedCell.columnInfo.prop,
+      selectedInfo?.rows,
+      checkedRow
+    );
+    const headCheckCell = this.tableColumns.find(
+      (t) => t.columnInfo.prop === checkedCell.columnInfo.prop
+    );
+    // 判断表头，勾选框状态
+    if (selectedInfo?.rows.length === this.tableBody.length) {
+      // 全选了
+      headCheckCell?.setCellValue({ checked: true, indeterminate: false });
+    } else if (selectedInfo?.rows.length === 0) {
+      // 没有选中
+      headCheckCell?.setCellValue({ checked: false, indeterminate: false });
+    } else {
+      // 半选
+      headCheckCell?.setCellValue({ checked: true, indeterminate: true });
+    }
+  }
+  /*
+   * 表头勾选框勾选事件
+   * */
+  headCheckBoxChange(checkedCell: CTable.ICell) {
+    const cellValue: CTable.checkBoxValueType = checkedCell.getCellValue();
+    const { checked, indeterminate } = cellValue;
+    const selectInfo = this.selectedRows.find(
+      (t) => t.colKey === checkedCell.columnInfo.prop
+    );
+    if (checked && indeterminate) {
+      // 半选状态，变全选
+      checkedCell.setCellValue({ checked: true, indeterminate: false });
+      this.tableBody.forEach((r) =>
+        r.rowCells
+          .find((c) => c.columnInfo.prop === checkedCell.columnInfo.prop)
+          ?.setCellValue({ checked: true, indeterminate: false })
+      );
+      if (selectInfo) {
+        selectInfo.rows = this.tableBody;
+      }
+    } else if (checked && !indeterminate) {
+      // 全选，变未选
+      checkedCell.setCellValue({ checked: false, indeterminate: false });
+      this.tableBody.forEach((r) =>
+        r.rowCells
+          .find((c) => c.columnInfo.prop === checkedCell.columnInfo.prop)
+          ?.setCellValue({ checked: false, indeterminate: false })
+      );
+      if (selectInfo) {
+        selectInfo.rows = [];
+      }
+    } else {
+      // 未选状态，变全选
+      checkedCell.setCellValue({ checked: true, indeterminate: false });
+      this.tableBody.forEach((r) =>
+        r.rowCells
+          .find((c) => c.columnInfo.prop === checkedCell.columnInfo.prop)
+          ?.setCellValue({ checked: true, indeterminate: false })
+      );
+      if (selectInfo) {
+        selectInfo.rows = this.tableBody;
+      }
+    }
+    // 传递事件
+    this.tableEvent.publish(
+      "SelectAll",
+      checkedCell.columnInfo.prop,
+      selectInfo?.rows
+    );
+    console.log(this.selectedRows, "111");
   }
 }
 

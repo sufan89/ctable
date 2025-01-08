@@ -145,6 +145,18 @@ onMounted(() => {
   }
   myTable = new CTable("myTable", tableConfig);
   myTable.setTableData(tableData);
+  myTable.on("RowClick", (data: CTable.IRow) => {
+    console.log(data, "RowClick");
+  });
+  myTable.on("HeaderRowClick", (data: CTable.IRow) => {
+    console.log(data, "HeaderRowClick");
+  });
+  myTable.on("CellClick", (data: CTable.ICell) => {
+    console.log(data, "CellClick");
+  });
+  myTable.on("HeaderCellClick", (data: CTable.ICell) => {
+    console.log(data, "HeaderCellClick");
+  });
 });
 </script>
 <style scoped>

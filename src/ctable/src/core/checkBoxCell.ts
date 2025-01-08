@@ -48,6 +48,8 @@ class checkBoxCell extends cellClass {
       ? "#c0c4cc"
       : this.checked
       ? "#ffffff"
+      : this.isContentSelect
+      ? cellStyle.backGround
       : cellStyle.borderColor;
     const checkedColor: string = this.disabled
       ? cellStyle.disabledCheckedColor
@@ -141,12 +143,13 @@ class checkBoxCell extends cellClass {
     };
   }
   /*
-   * 设置选中值
+   * 设置单元格值
    * */
-  setCheckValue(checked: boolean, indeterminate: boolean) {
+  // @ts-ignore
+  setCellValue(value: CTable.cellValueType | CTable.checkBoxValueType) {
+    const { checked, indeterminate } = value as CTable.checkBoxValueType;
     this.checked = checked;
     this.indeterminate = indeterminate;
-    this.renderCell();
   }
 }
 export default checkBoxCell;

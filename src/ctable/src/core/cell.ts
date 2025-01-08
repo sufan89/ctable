@@ -16,6 +16,7 @@ class CellClass implements CTable.ICell {
   isMouseSelectRow: boolean;
   isMouseSelect: boolean;
   disabled: boolean;
+  isContentSelect: boolean;
   /**
    * canvas上下文
    */
@@ -43,6 +44,7 @@ class CellClass implements CTable.ICell {
     this.disabled = false;
     this.isMouseSelectRow = false;
     this.isMouseSelect = false;
+    this.isContentSelect = false;
   }
 
   getCellValue(): CTable.cellValueType {
@@ -189,6 +191,33 @@ class CellClass implements CTable.ICell {
    * */
   setMouseSelect(isSelect: boolean = false) {
     this.isMouseSelect = isSelect;
+  }
+  /*
+   * 计算给定点，计算当前点是否在单元给内容框内
+   * */
+  isPointInContent(x: number, y: number): boolean {
+    const cellPosition = this.cellPosition;
+    const contentSize = this.contentSize;
+    const contentPosition = this.getContentPosition();
+    const contentBBox = {
+      x: cellPosition.x + contentPosition.x,
+      width: cellPosition.x + contentPosition.x + contentSize.width,
+      y: cellPosition.y + contentPosition.y,
+      height: cellPosition.y + contentPosition.y + contentSize.height,
+    };
+    return (
+      contentBBox.x < x &&
+      x < contentBBox.width &&
+      contentBBox.y < y &&
+      y < contentBBox.height
+    );
+  }
+  /*
+   * 设置单元格值
+   * */
+  // @ts-ignore
+  setCellValue(value: CTable.cellValueType | CTable.checkBoxValueType) {
+    this.realVal = value;
   }
 }
 export default CellClass;

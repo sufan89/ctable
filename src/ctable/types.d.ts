@@ -156,18 +156,6 @@ declare namespace CTable {
   export type GetHeaderCellStyle = {
     (colInfo: CTable.ColumnConfig): CTable.ICellStyle;
   };
-  /*
-   * 表格事件名称
-   * */
-  export type TableEventName =
-    | "CellClick"
-    | "RowClick"
-    | "HeaderClick"
-    | "HeaderCellClick"
-    | "CellMouseEnter"
-    | "CellMouseLeave"
-    | "CellDoubleClick"
-    | "RowDoubleClick";
 
   export interface ITable {
     parentElement: HTMLElement | null;
@@ -186,16 +174,43 @@ declare namespace CTable {
     reRender: Function;
     wheelSpeed: number;
     /*
+     * 处理行勾选框
+     * */
+    rowCheckBoxChange: Function;
+    /*
+     * 处理表头勾选框
+     * */
+    headCheckBoxChange: Function;
+    /*
      * 添加事件
      * */
-    on: (eventName: string, callBack: Function, callOnce?: boolean) => void;
+    on: (
+      eventName: CTable.TableEventName,
+      callBack: Function,
+      callOnce?: boolean
+    ) => void;
     /*
      * 移除事件
      * */
-    removeEvent: (eventName: string) => void;
+    removeEvent: (eventName: CTable.TableEventName) => void;
     /*
      * 当前绘制的行数据
      * */
     viewRows: Array<CTable.IRow>;
   }
+  /*
+   * 表格事件名称
+   * */
+  export type TableEventName =
+    | "CellClick"
+    | "RowClick"
+    | "HeaderRowClick"
+    | "HeaderCellClick"
+    | "CellMouseEnter"
+    | "CellMouseLeave"
+    | "CellDoubleClick"
+    | "SelectAll"
+    | "Select"
+    | "SelectionChange"
+    | "RowDoubleClick";
 }

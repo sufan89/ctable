@@ -36,7 +36,7 @@ declare namespace CTable {
     /*
      * 获取单元格值
      * */
-    getCellValue: () => CTable.cellValueType;
+    getCellValue: () => CTable.cellValueType | CTable.checkBoxValueType;
     /*
      * 禁用状态
      * */
@@ -53,6 +53,22 @@ declare namespace CTable {
      * 设置当前单元格鼠标选中状态
      * */
     setMouseSelect: (isSelect: boolean) => void;
+    /*
+     * 获取当前内容绘制位置
+     * */
+    getContentPosition: () => CTable.position;
+    /*
+     * 计算当前给定位置，计算当前位置是否在单元格绘制内容区域内
+     * */
+    isPointInContent: (x: number, y: number) => boolean;
+    /*
+     * 当前单元格内容是否被选中
+     * */
+    isContentSelect: boolean;
+    /*
+     * 设置单元格值
+     * */
+    setCellValue(value: CTable.cellValueType | CTable.checkBoxValueType): void;
   }
   /*
    * 位置
@@ -71,7 +87,21 @@ declare namespace CTable {
   /*
    * 单元格内容类型
    * */
-  export type cellValueType = string | number | object | [] | null | undefined;
+  export type cellValueType =
+    | string
+    | number
+    | object
+    | []
+    | null
+    | undefined
+    | boolean;
+  /*
+   * checkBox值类型
+   * */
+  export type checkBoxValueType = {
+    checked: boolean;
+    indeterminate: boolean;
+  };
   /*
    * 单元格类型
    * */

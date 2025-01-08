@@ -10,10 +10,6 @@ class TableEventClass implements CTable.ITableEvent {
   ctx: CTable.ITable;
   pressKeyCode!: string;
   isMouseIn!: boolean;
-  mouseButton: {
-    button: number;
-    buttons: number;
-  };
   mouseCursor: CTable.cursorType;
   /*
    * 表格事件主体
@@ -23,13 +19,10 @@ class TableEventClass implements CTable.ITableEvent {
    * 鼠标移动是选中的数据
    * */
   mouseOverData: CTable.MouseOverInfo;
+
   constructor(context: CTable.ITable) {
     this.ctx = context;
     this.eventObj = new eventBus();
-    this.mouseButton = {
-      button: 0,
-      buttons: 0,
-    };
     this.mouseCursor = "default";
     const { tableElement } = context;
     if (tableElement) {
@@ -57,6 +50,8 @@ class TableEventClass implements CTable.ITableEvent {
       tableElement.addEventListener("mouseenter", (event) => {
         this.onMouseenter(event);
       });
+      // 鼠标点击事件
+      tableElement.addEventListener("click", (event) => this.onClick(event));
       /*
        * 画布监听不了键盘事件，所以直接监听body的键盘事件
        * */
@@ -93,6 +88,7 @@ class TableEventClass implements CTable.ITableEvent {
   removeEvent(eventName: string): void {
     this.eventObj.clearEvent(eventName);
   }
+
   /*
    * 处理滚轮事件
    * */
@@ -120,14 +116,22 @@ class TableEventClass implements CTable.ITableEvent {
     // 修改滚动条位置
     this.ctx.tableScrollBar.setBarPosition(offsetSize);
   }
+
   /*
    * 处理键盘按下事件
    * */
   onKeydown(event: KeyboardEvent) {
     const { code } = event;
+    // 当按键一直按住的时候，这个事件会一直触发
     this.pressKeyCode = code;
-    this.changeMousePoint();
+    if (this.pressKeyCode === "Space" && this.isMouseIn) {
+      if (this.mouseCursor !== "grab" && this.mouseCursor !== "grabbing") {
+        this.mouseCursor = "grab";
+        this.changeMousePoint(this.mouseCursor);
+      }
+    }
   }
+
   /*
    * 处理键盘松开事件
    * */
@@ -137,29 +141,32 @@ class TableEventClass implements CTable.ITableEvent {
     if (this.pressKeyCode === code) {
       this.pressKeyCode = "";
     }
-    this.changeMousePoint();
+    this.mouseCursor = "default";
+    this.changeMousePoint(this.mouseCursor);
   }
+
   /*
    * 鼠标移入事件
    * */
   onMouseenter(e: MouseEvent) {
     this.isMouseIn = true;
-    this.changeMousePoint();
+    this.changeMousePoint(this.mouseCursor);
   }
+
   /*
    * 鼠标移出事件
    * */
   onMouseLeave(e: MouseEvent) {
     this.isMouseIn = false;
-    this.mouseButton = { button: 0, buttons: 0 };
     // 鼠标移出之后，需要清空鼠标移动选中数据
     this.mouseOverData = {
       currentRow: null,
       currentCell: null,
       isHeader: false,
     };
-    this.changeMousePoint();
+    this.changeMousePoint("default");
   }
+
   /*
    * 鼠标移动事件
    * */
@@ -172,69 +179,81 @@ class TableEventClass implements CTable.ITableEvent {
     } else if (this.isMouseIn) {
       // 计算当前鼠标移动位置在哪行数据，哪个单元格
       this.mouseOverData = this.getMousePointInfo(offsetX, offsetY);
+      // 先将所有当前绘制的数据，置为false
+      this.ctx.viewRows.forEach((row) => {
+        row.setMouseSelect(false);
+      });
       // 高亮当前鼠标移动选中数据
       if (!this.mouseOverData.isHeader) {
-        // 先将所有当前绘制的数据，置为false
-        this.ctx.viewRows.forEach((row) => {
-          row.setMouseSelect(false);
-        });
         this.mouseOverData.currentRow?.setMouseSelect(true);
-        this.mouseOverData.currentCell?.setMouseSelect(true);
-        this.ctx.reRender();
       }
+      // 处理CheckBox交互
+      const { currentCell } = this.mouseOverData;
+      if (currentCell) {
+        if (currentCell.cellType === "checkbox") {
+          // 计算当前鼠标位置是否在勾选框内
+          if (currentCell.isPointInContent(offsetX, offsetY)) {
+            currentCell.isContentSelect = true;
+            if (currentCell.disabled) {
+              this.mouseCursor = "not-allowed";
+            } else {
+              // 改变鼠标状态
+              this.mouseCursor = "pointer";
+            }
+          } else {
+            currentCell.isContentSelect = false;
+            this.mouseCursor = "default";
+          }
+          const { tableElement } = this.ctx;
+          if (tableElement) {
+            tableElement.style.cursor = this.mouseCursor;
+          }
+        }
+      }
+      this.ctx.reRender();
     }
     // todo 拖动表头宽度
     // todo 拖动表头进行排序
-    // todo 拖动行进行排序
   }
+
   /*
    * 改变鼠标指针状态
    * */
-  changeMousePoint() {
+  changeMousePoint(cursor: CTable.cursorType = "default") {
     const { tableElement } = this.ctx;
-    if (!this.isMouseIn) {
-      this.mouseCursor = "default";
-    }
-    if (this.pressKeyCode !== "Space") {
-      this.mouseCursor = "default";
-    }
-    const { button, buttons } = this.mouseButton;
-    const pressMainMouseButton: boolean = button === 0 && buttons === 1;
-    if (
-      this.isMouseIn &&
-      this.pressKeyCode === "Space" &&
-      pressMainMouseButton
-    ) {
-      this.mouseCursor = "grabbing";
-    } else if (
-      this.isMouseIn &&
-      this.pressKeyCode === "Space" &&
-      !pressMainMouseButton
-    ) {
-      this.mouseCursor = "grab";
-    } else {
-      this.mouseCursor = "default";
-    }
     if (tableElement) {
-      tableElement.style.cursor = this.mouseCursor;
+      tableElement.style.cursor = cursor;
     }
   }
+
   /*
    * 处理鼠标按键事件
    * */
   onMousedown(e: MouseEvent) {
     const { button, buttons } = e;
-    this.mouseButton = { button, buttons };
-    this.changeMousePoint();
+    // 是否是主键按下了
+    const pressMainMouseButton: boolean = button === 0 && buttons === 1;
+    // 如果是主键按下，且按住了空格键，且当前鼠标位置在表格内，则将鼠标指针改为抓取状态
+    if (
+      this.isMouseIn &&
+      pressMainMouseButton &&
+      this.pressKeyCode === "Space"
+    ) {
+      this.mouseCursor = "grabbing";
+      this.changeMousePoint(this.mouseCursor);
+    }
   }
+
   /*
    * 处理鼠标按键松开事件
    * */
   onMouseup(e: MouseEvent) {
-    const { button, buttons } = e;
-    this.mouseButton = { button, buttons };
-    this.changeMousePoint();
+    if (this.isMouseIn && this.pressKeyCode === "Space") {
+      this.mouseCursor = "grab";
+      this.changeMousePoint(this.mouseCursor);
+    }
   }
+
   /*
    * 拖动画布
    * */
@@ -254,6 +273,7 @@ class TableEventClass implements CTable.ITableEvent {
     // 修改滚动条位置
     this.ctx.tableScrollBar.setBarPosition(offsetSize);
   }
+
   /*
    * 获取当前鼠标移动的点属于哪个行，哪个单元格
    * */
@@ -287,6 +307,7 @@ class TableEventClass implements CTable.ITableEvent {
       }
     }
     // 获取鼠标指针当前所在的单元格信息
+    // 如果是表头单元格，且有二级表头，则计算有异常
     if (data.currentRow) {
       const { rowCells } = data.currentRow;
       for (let index = 0; index < rowCells.length; index++) {
@@ -304,5 +325,43 @@ class TableEventClass implements CTable.ITableEvent {
     }
     return data;
   }
+
+  /*
+   * 鼠标点击事件
+   * */
+  onClick(event: MouseEvent) {
+    const { currentRow, currentCell, isHeader } = this.mouseOverData;
+    // 当前鼠标指针未选中任何数据，直接跳过，不进行事件处理
+    if (!currentRow || !currentCell) {
+      return;
+    }
+    // 只有非表格拖动状态时，才进行表格点击事件传递
+    if (this.mouseCursor !== "grab" && this.mouseCursor !== "grabbing") {
+      if (
+        currentCell &&
+        currentCell.cellType === "checkbox" &&
+        currentCell.isContentSelect
+      ) {
+        //点击的是勾选框
+        // 如果是点击的是行，需要记录当前选中了哪些数据
+        // 如果点击的是表头的勾选框，则需要判断是否是全选还是取消勾选
+        if (isHeader) {
+          this.ctx.headCheckBoxChange(currentCell);
+        } else {
+          this.ctx.rowCheckBoxChange(currentCell, currentRow);
+        }
+      } else {
+        this.ctx.tableEvent.publish(
+          isHeader ? "HeaderRowClick" : "RowClick",
+          currentRow
+        );
+        this.ctx.tableEvent.publish(
+          isHeader ? "HeaderCellClick" : "CellClick",
+          currentCell
+        );
+      }
+    }
+  }
 }
+
 export default TableEventClass;

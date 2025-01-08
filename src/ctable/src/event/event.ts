@@ -21,9 +21,8 @@ class eventBus implements CTable.IEventBus {
   publish<T extends any[]>(eventName: string, ...args: T): void {
     // 取出当前事件所有的回调函数
     const callbackObject = this.eventObject[eventName];
-
     if (!callbackObject) {
-      return console.warn(eventName + " not found!");
+      return;
     }
     // 执行每一个回调函数
     for (const id in callbackObject) {
