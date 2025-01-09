@@ -4,6 +4,7 @@ import imgCell from "../core/imgCell";
 import buttonCell from "../core/buttonCell";
 import customCell from "../core/customCell";
 import rowClass from "../core/row";
+import { CTable } from "@/ctable";
 
 class tableHeader extends rowClass {
   /*
@@ -142,6 +143,9 @@ class tableHeader extends rowClass {
    * */
   public getRowInfo() {
     return this.rowCells;
+  }
+  getRowData(): CTable.rowValueType | Array<CTable.ColumnConfig> {
+    return this.headerConfigInfo;
   }
 }
 export default tableHeader;

@@ -4,6 +4,7 @@ import imgCell from "@/ctable/src/core/imgCell";
 import buttonCell from "@/ctable/src/core/buttonCell";
 import customCell from "@/ctable/src/core/customCell";
 import rowClass from "@/ctable/src/core/row";
+import { CTable } from "@/ctable";
 
 class bodyRow extends rowClass {
   /*
@@ -173,6 +174,9 @@ class bodyRow extends rowClass {
         x = x + cell.cellSize.width;
       });
     }
+  }
+  getRowData(): CTable.rowValueType | Array<CTable.ColumnConfig> {
+    return this.rowData;
   }
 }
 export default bodyRow;

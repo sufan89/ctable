@@ -144,6 +144,10 @@ declare namespace CTable {
      * */
     // eslint-disable-next-line no-unused-vars
     setMouseSelect: (isSelect: boolean) => void;
+    /*
+     * 获取当前行数据
+     * */
+    getRowData: () => CTable.rowValueType | Array<CTable.ColumnConfig>;
   }
   /*
    * 表格行数据类型

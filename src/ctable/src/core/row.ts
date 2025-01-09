@@ -120,5 +120,8 @@ class rowClass implements CTable.IRow {
       }
     });
   }
+  getRowData(): CTable.rowValueType | Array<CTable.ColumnConfig> {
+    return {};
+  }
 }
 export default rowClass;

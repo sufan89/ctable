@@ -157,6 +157,19 @@ onMounted(() => {
   myTable.on("HeaderCellClick", (data: CTable.ICell) => {
     console.log(data, "HeaderCellClick");
   });
+  myTable.on("SelectAll", (colKey: String, rows: Array<CTable.IRow>) => {
+    console.log(colKey, rows, "11");
+  });
+  myTable.on(
+    "SelectionChange",
+    (
+      colKey: String,
+      selectRows: Array<CTable.rowValueType>,
+      currentRow: CTable.rowValueType
+    ) => {
+      console.log(colKey, selectRows, currentRow, "SelectionChange");
+    }
+  );
 });
 </script>
 <style scoped>

@@ -319,7 +319,8 @@ class tableClass implements CTable.ITable {
    * */
   rowCheckBoxChange(checkedCell: CTable.ICell, checkedRow: CTable.IRow) {
     // 获取当前勾选框值信息
-    const cellValue: CTable.checkBoxValueType = checkedCell.getCellValue();
+    const cellValue: CTable.checkBoxValueType =
+      checkedCell.getCellValue() as CTable.checkBoxValueType;
     const cellCol: CTable.ColumnConfig = checkedCell.columnInfo;
     const selectedInfo = this.selectedRows.find(
       (t) => t.colKey === cellCol.prop
@@ -343,8 +344,8 @@ class tableClass implements CTable.ITable {
     this.tableEvent.publish(
       "SelectionChange",
       checkedCell.columnInfo.prop,
-      selectedInfo?.rows,
-      checkedRow
+      selectedInfo?.rows.map((t) => t.getRowData()),
+      checkedRow.getRowData()
     );
     const headCheckCell = this.tableColumns.find(
       (t) => t.columnInfo.prop === checkedCell.columnInfo.prop
@@ -365,7 +366,8 @@ class tableClass implements CTable.ITable {
    * 表头勾选框勾选事件
    * */
   headCheckBoxChange(checkedCell: CTable.ICell) {
-    const cellValue: CTable.checkBoxValueType = checkedCell.getCellValue();
+    const cellValue: CTable.checkBoxValueType =
+      checkedCell.getCellValue() as CTable.checkBoxValueType;
     const { checked, indeterminate } = cellValue;
     const selectInfo = this.selectedRows.find(
       (t) => t.colKey === checkedCell.columnInfo.prop
@@ -405,12 +407,20 @@ class tableClass implements CTable.ITable {
       }
     }
     // 传递事件
+    if (selectInfo?.rows.length === this.tableBody.length) {
+      // 如果全选了，则触发全选事件
+      this.tableEvent.publish(
+        "SelectAll",
+        checkedCell.columnInfo.prop,
+        selectInfo?.rows.map((t) => t.getRowData())
+      );
+    }
     this.tableEvent.publish(
-      "SelectAll",
+      "SelectionChange",
       checkedCell.columnInfo.prop,
-      selectInfo?.rows
+      selectInfo?.rows.map((t) => t.getRowData()),
+      this.tableHeader.getRowData()
     );
-    console.log(this.selectedRows, "111");
   }
 }
 
