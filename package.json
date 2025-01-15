@@ -1,0 +1,41 @@
+{
+  "name": "@sufan_89/ctable",
+  "version": "1.0.0-beta.1",
+  "files": [
+    "dist",
+    "index.d.ts",
+    "ctable.umd.js"
+  ],
+  "main": "./dist/ctable.umd.js",
+  "module": "./dist/ctable.js",
+  "style": "./dist/ctable.css",
+  "types": "./src/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/ctable.js",
+      "require": "./dist/ctable.umd.js"
+    },
+    "./*": "./*"
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "watch": "tsc && vite build --watch"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "vite": "^6.0.1"
+  },
+  "dependencies": {
+    "guid-typescript": "^1.0.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sufan89/ctable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sufan89/ctable/issues"
+  },
+  "keywords": [ "Canvas Table","TypeScript"]
+}
