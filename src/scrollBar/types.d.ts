@@ -61,7 +61,7 @@ declare namespace CTable {
      * */
     addEvent: (
       eventName: string,
-      callBack: Function,
+      callBack: (data: { scrollTop: number; scrollHeight: number; scrollLeft: number; scrollWidth: number }) => void,
       callOnce?: boolean
     ) => void;
     /*
@@ -72,6 +72,10 @@ declare namespace CTable {
      * 获取滚动区域尺寸
      * */
     getScrollSize: () => CTable.size;
+    /*
+     * 销毁滚动条，清理事件监听器
+     * */
+    destroy: () => void;
   }
   /*
    * 滚动条
@@ -118,7 +122,7 @@ declare namespace CTable {
      * */
     addEvent: (
       eventName: string,
-      callBack: Function,
+      callBack: (data: { scrollTop: number; scrollHeight: number } | { scrollLeft: number; scrollWidth: number }) => void,
       callOnce?: boolean
     ) => void;
     /*
@@ -129,5 +133,9 @@ declare namespace CTable {
      * 获取滚动尺寸
      * */
     getScrollSize: () => number;
+    /*
+     * 销毁滚动条，清理事件监听器
+     * */
+    destroy: () => void;
   }
 }

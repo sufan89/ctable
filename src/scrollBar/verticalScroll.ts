@@ -13,6 +13,10 @@ class verticalScrollClass implements CTable.IBar {
    * 滚动条事件总线
    * */
   scrollEvent: CTable.IEventBus;
+  /*
+   * 绑定的事件处理器
+   * */
+  private scrollHandler: () => void;
   constructor(tableEl: HTMLElement, isShow: boolean) {
     this.currentPosition = 0;
     this.scrollSize = 0;
@@ -22,6 +26,8 @@ class verticalScrollClass implements CTable.IBar {
      * 滚动条事件总线
      * */
     this.scrollEvent = new eventBus();
+    // 创建绑定的事件处理器
+    this.scrollHandler = () => {};
     if (tableEl) {
       this.barElement = document.createElement("div");
       this.barElement.setAttribute("class", "table-vertical-scroll");
@@ -68,7 +74,7 @@ class verticalScrollClass implements CTable.IBar {
   initEvent() {
     let ticking: boolean = false;
     if (this.barElement) {
-      this.barElement.addEventListener("scroll", () => {
+      this.scrollHandler = () => {
         if (!ticking) {
           window.requestAnimationFrame(() => {
             this.currentPosition = this.barElement?.scrollTop || 0;
@@ -81,13 +87,14 @@ class verticalScrollClass implements CTable.IBar {
           });
           ticking = true;
         }
-      });
+      };
+      this.barElement.addEventListener("scroll", this.scrollHandler);
     }
   }
   /*
    * 添加事件
    * */
-  addEvent(eventName: string, callBack: Function, callOnce: boolean = false) {
+  addEvent(eventName: string, callBack: (data: { scrollTop: number; scrollHeight: number }) => void, callOnce: boolean = false) {
     if (callOnce) {
       this.scrollEvent.subscribeOnce(eventName, callBack);
     } else {
@@ -105,6 +112,15 @@ class verticalScrollClass implements CTable.IBar {
    * */
   getScrollSize(): number {
     return this.barElement.scrollHeight;
+  }
+  /*
+   * 销毁滚动条，清理事件监听器
+   * */
+  destroy(): void {
+    if (this.barElement && this.scrollHandler) {
+      this.barElement.removeEventListener("scroll", this.scrollHandler);
+    }
+    this.scrollEvent.clearEvent("");
   }
 }
 

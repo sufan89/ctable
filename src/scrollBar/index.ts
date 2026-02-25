@@ -54,12 +54,17 @@ class scrollBarClass implements CTable.IScrollBar {
         this.isShowVertical
       );
       // 垂直滚动条添加滚动事件
-      this.verticalScroll.addEvent("scroll", this.onVerticalScroll.bind(this));
+      this.verticalScroll.addEvent("scroll", (data: { scrollTop: number; scrollHeight: number } | { scrollLeft: number; scrollWidth: number }) => {
+        if ('scrollTop' in data && 'scrollHeight' in data) {
+          this.onVerticalScroll(data as { scrollTop: number; scrollHeight: number });
+        }
+      });
       // 水平滚动条添加滚动事件
-      this.horizontalScroll.addEvent(
-        "scroll",
-        this.onHorizontalScroll.bind(this)
-      );
+      this.horizontalScroll.addEvent("scroll", (data: { scrollTop: number; scrollHeight: number } | { scrollLeft: number; scrollWidth: number }) => {
+        if ('scrollLeft' in data && 'scrollWidth' in data) {
+          this.onHorizontalScroll(data as { scrollLeft: number; scrollWidth: number });
+        }
+      });
     } else {
       this.horizontalScroll = null;
       this.verticalScroll = null;
@@ -70,7 +75,7 @@ class scrollBarClass implements CTable.IScrollBar {
     this.scrollEvent = new eventBus();
   }
 
-  addEvent(eventName: string, callBack: Function, callOnce: boolean = false) {
+  addEvent(eventName: string, callBack: (data: { scrollTop: number; scrollHeight: number; scrollLeft: number; scrollWidth: number }) => void, callOnce: boolean = false) {
     if (callOnce) {
       this.scrollEvent.subscribeOnce(eventName, callBack);
     } else {
@@ -139,9 +144,10 @@ class scrollBarClass implements CTable.IScrollBar {
    * */
   onVerticalScroll(data: { scrollTop: number; scrollHeight: number }) {
     this.scrollEvent.publish("scroll", {
-      ...data,
-      scrollLeft: this.horizontalScroll?.currentPosition,
-      scrollWidth: this.horizontalScroll?.scrollSize,
+      scrollTop: data.scrollTop,
+      scrollHeight: data.scrollHeight,
+      scrollLeft: this.horizontalScroll?.currentPosition || 0,
+      scrollWidth: this.horizontalScroll?.scrollSize || 0,
     });
   }
 
@@ -150,9 +156,10 @@ class scrollBarClass implements CTable.IScrollBar {
    * */
   onHorizontalScroll(data: { scrollLeft: number; scrollWidth: number }) {
     this.scrollEvent.publish("scroll", {
-      ...data,
-      scrollTop: this.verticalScroll?.currentPosition,
-      scrollHeight: this.verticalScroll?.scrollSize,
+      scrollTop: this.verticalScroll?.currentPosition || 0,
+      scrollHeight: this.verticalScroll?.scrollSize || 0,
+      scrollLeft: data.scrollLeft,
+      scrollWidth: data.scrollWidth,
     });
   }
   /*
@@ -167,6 +174,24 @@ class scrollBarClass implements CTable.IScrollBar {
       size.height = this.verticalScroll.getScrollSize();
     }
     return size;
+  }
+
+  /*
+   * 销毁滚动条，清理事件监听器
+   * */
+  destroy(): void {
+    // 销毁垂直滚动条
+    if (this.verticalScroll) {
+      this.verticalScroll.destroy();
+    }
+
+    // 销毁水平滚动条
+    if (this.horizontalScroll) {
+      this.horizontalScroll.destroy();
+    }
+
+    // 清除所有订阅的事件
+    this.scrollEvent.clearEvent("");
   }
 }
 

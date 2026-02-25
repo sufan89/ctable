@@ -1,6 +1,6 @@
 /*
  * 水平滚动条类
- * */
+ */
 
 import eventBus from "../event/event";
 
@@ -11,6 +11,8 @@ class horizontalScrollClass implements CTable.IBar {
   barContentElement!: HTMLElement;
   scrollEvent: CTable.IEventBus;
   scrollSize: number;
+  private scrollHandler: () => void;
+
   constructor(tableEl: HTMLElement, isShow: boolean) {
     this.currentPosition = 0;
     this.scrollSize = 0;
@@ -20,6 +22,10 @@ class horizontalScrollClass implements CTable.IBar {
      * */
     this.scrollEvent = new eventBus();
     this.barContentElement = document.createElement("div");
+
+    // 创建绑定的事件处理器
+    this.scrollHandler = () => {};
+
     if (tableEl !== null) {
       // 创建水平滚动条元素
       this.barElement = document.createElement("div");
@@ -29,13 +35,14 @@ class horizontalScrollClass implements CTable.IBar {
       this.initEvent();
     }
   }
+
   /*
    * 初始化事件
    * */
   initEvent() {
     let ticking: boolean = false;
     if (this.barElement) {
-      this.barElement.addEventListener("scroll", () => {
+      this.scrollHandler = () => {
         if (!ticking) {
           window.requestAnimationFrame(() => {
             this.scrollSize = this.barElement?.scrollWidth || 0;
@@ -48,9 +55,11 @@ class horizontalScrollClass implements CTable.IBar {
           });
           ticking = true;
         }
-      });
+      };
+      this.barElement.addEventListener("scroll", this.scrollHandler);
     }
   }
+
   setPosition(position: number): void {
     if (this.barElement) {
       this.barElement.scrollLeft = position;
@@ -73,12 +82,13 @@ class horizontalScrollClass implements CTable.IBar {
       }
     });
   }
+
   /*
    * 订阅事件
    * */
   addEvent(
     eventName: string,
-    callBack: Function,
+    callBack: (data: { scrollLeft: number; scrollWidth: number }) => void,
     callOnce: boolean = false
   ): void {
     if (callOnce) {
@@ -87,17 +97,29 @@ class horizontalScrollClass implements CTable.IBar {
       this.scrollEvent.subscribe(eventName, callBack);
     }
   }
+
   /*
    * 移除事件
    * */
   removeEvent(eventName: string) {
     this.scrollEvent.clearEvent(eventName);
   }
+
   /*
    * 获取滚动区域大小
    * */
   getScrollSize(): number {
     return this.barElement.scrollWidth;
+  }
+
+  /*
+   * 销毁滚动条，清理事件监听器
+   * */
+  destroy(): void {
+    if (this.barElement && this.scrollHandler) {
+      this.barElement.removeEventListener("scroll", this.scrollHandler);
+    }
+    this.scrollEvent.clearEvent("");
   }
 }
 export default horizontalScrollClass;

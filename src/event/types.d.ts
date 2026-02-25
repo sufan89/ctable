@@ -7,11 +7,11 @@ declare namespace CTable {
     /*
      * 订阅事件
      * */
-    subscribe(eventName: string, callback: Function): ISubscribe;
+    subscribe(eventName: string, callback: (...args: any[]) => void): ISubscribe;
     /*
      * 订阅事件，且事件只会触发一次
      * */
-    subscribeOnce(eventName: string, callback: Function): ISubscribe;
+    subscribeOnce(eventName: string, callback: (...args: any[]) => void): ISubscribe;
     /*
      * 清除事件
      * */
@@ -31,7 +31,7 @@ declare namespace CTable {
    * 回调列表
    * */
   type callbackList = {
-    [id: string]: Function;
+    [id: string]: (...args: any[]) => void;
   };
   /*
    * 事件对象
@@ -89,13 +89,17 @@ declare namespace CTable {
      * */
     on: (
       eventName: CTable.TableEventName,
-      callBack: Function,
+      callBack: (...args: any[]) => void,
       callOnce?: boolean
     ) => void;
     /*
      * 移除事件
      * */
     removeEvent: (eventName: CTable.TableEventName) => void;
+    /*
+     * 销毁事件监听器
+     * */
+    destroy: () => void;
   }
   /*
    * 鼠标移入时，鼠标指针当前的数据信息

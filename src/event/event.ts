@@ -38,7 +38,7 @@ class eventBus implements CTable.IEventBus {
   /*
    * 订阅事件
    * */
-  subscribe(eventName: string, callback: Function): CTable.ISubscribe {
+  subscribe(eventName: string, callback: (...args: any[]) => void): CTable.ISubscribe {
     if (!this.eventObject[eventName]) {
       this.eventObject[eventName] = {};
     }
@@ -58,7 +58,7 @@ class eventBus implements CTable.IEventBus {
   /*
    * 订阅事件，但是改事件只会被触发一次
    * */
-  subscribeOnce(eventName: string, callback: Function): CTable.ISubscribe {
+  subscribeOnce(eventName: string, callback: (...args: any[]) => void): CTable.ISubscribe {
     if (!this.eventObject[eventName]) {
       this.eventObject[eventName] = {};
     }

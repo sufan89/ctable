@@ -186,7 +186,7 @@ declare namespace CTable {
          * */
         on: (
             eventName: CTable.TableEventName,
-            callBack: Function,
+            callBack: (...args: any[]) => void,
             callOnce?: boolean
         ) => void;
         /*
@@ -214,3 +214,5 @@ declare namespace CTable {
         | "SelectionChange"
         | "RowDoubleClick";
 }
+// 导入工具函数类型
+/// <reference path="./tools/types.d.ts" />

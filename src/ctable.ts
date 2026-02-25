@@ -18,7 +18,7 @@ class tableClass implements CTable.ITable {
   /**
    * 表格Element
    */
-  tableElement: HTMLCanvasElement;
+  tableElement: HTMLCanvasElement | null;
   /**
    * canvas上下文
    */
@@ -89,16 +89,17 @@ class tableClass implements CTable.ITable {
    * @return CTable 返回表格实例
    */
   constructor(elm: string, tableConfig: CTable.TableConfig) {
-    if (!elm && elm === "") {
-      console.error("root element is not define");
+    if (!elm || elm === "") {
+      throw new Error("root element id is required");
     }
     // 获取根节点信息
     this.parentElement = document.getElementById(elm);
+    if (!this.parentElement) {
+      throw new Error(`root element with id "${elm}" not found`);
+    }
     this.tableElement = document.createElement("canvas");
     this.tableElement.setAttribute("class", "table-main");
-    if (this.parentElement !== null) {
-      this.parentElement.appendChild(this.tableElement);
-    }
+    this.parentElement.appendChild(this.tableElement);
     const { wheelSpeed } = tableConfig;
     if (wheelSpeed) {
       this.wheelSpeed = wheelSpeed;
@@ -129,8 +130,7 @@ class tableClass implements CTable.ITable {
     this.tableColumns = [];
     this.ctx = this.tableElement.getContext("2d");
     if (!this.ctx) {
-      console.error("当前浏览器不支持canvas绘制");
-      return;
+      throw new Error("当前浏览器不支持canvas绘制");
     }
     this.selectedRows = [];
     // 初始化表头
@@ -164,8 +164,8 @@ class tableClass implements CTable.ITable {
     });
     // 重新设置可视区域大小
     this.tableScrollBar.setViewSize({
-      width: this.tableElement.width,
-      height: this.tableElement.height - this.tableHeader.rowHeight,
+      width: this.tableElement?.width || 0,
+      height: this.tableElement?.height ? this.tableElement.height - this.tableHeader.rowHeight : 0,
     });
   }
   /*
@@ -173,13 +173,15 @@ class tableClass implements CTable.ITable {
    * */
   private changeCanvasSize() {
     const boundRect = this.parentElement?.getBoundingClientRect();
-    this.tableElement.width = boundRect ? boundRect.width : 200;
-    this.tableElement.height = boundRect ? boundRect.height : 200;
-    this.viewSize = {
-      width: this.tableElement.width,
-      height: this.tableElement.height,
-    };
-    this.tableScrollBar.setViewSize(this.viewSize);
+    if (this.tableElement) {
+      this.tableElement.width = boundRect ? boundRect.width : 200;
+      this.tableElement.height = boundRect ? boundRect.height : 200;
+      this.viewSize = {
+        width: this.tableElement.width,
+        height: this.tableElement.height,
+      };
+      this.tableScrollBar.setViewSize(this.viewSize);
+    }
   }
   /*
    * 重新渲染-刷新
@@ -244,16 +246,22 @@ class tableClass implements CTable.ITable {
   }
   /*
    * 平铺表格列
+   * 使用迭代方式替代递归，避免深层嵌套时的栈溢出问题
    * */
   flatTableColumns(cols: Array<CTable.ICell>) {
-    cols.forEach((col) => {
-      if (col.children && col.children.length > 0) {
-        this.flatTableColumns(col.children);
-      } else {
-        // 只保留子节点
+    const stack = [...cols]; // 使用栈来存储待处理的列
+
+    while (stack.length > 0) {
+      const col = stack.pop();
+
+      if (col && col.children && col.children.length > 0) {
+        // 如果有子节点，将子节点加入栈中
+        stack.push(...col.children);
+      } else if (col) {
+        // 只保留叶子节点
         this.tableColumns.push(col);
       }
-    });
+    }
   }
   /*
    * 滚动条事件
@@ -301,7 +309,7 @@ class tableClass implements CTable.ITable {
   /*
    * 添加事件
    * */
-  on(eventName: CTable.TableEventName, callBack: Function, callOnce?: boolean) {
+  on(eventName: CTable.TableEventName, callBack: (...args: any[]) => void, callOnce?: boolean) {
     if (callOnce) {
       this.tableEvent.subscribeOnce(eventName, callBack);
     } else {
@@ -421,6 +429,35 @@ class tableClass implements CTable.ITable {
       selectInfo?.rows.map((t) => t.getRowData()),
       this.tableHeader.getRowData()
     );
+  }
+
+  /*
+   * 销毁表格实例，清理事件监听器和资源
+   * */
+  destroy(): void {
+    // 销毁事件处理器
+    if (this.tableEventObj) {
+      this.tableEventObj.destroy();
+    }
+
+    // 销毁滚动条
+    if (this.tableScrollBar) {
+      this.tableScrollBar.destroy();
+    }
+
+    // 移除DOM元素
+    if (this.tableElement && this.parentElement) {
+      this.parentElement.removeChild(this.tableElement);
+    }
+
+    // 清理引用，释放内存
+    this.ctx = null;
+    this.tableElement = null;
+    this.parentElement = null;
+    this.tableBody = [];
+    this.tableColumns = [];
+    this.viewRows = [];
+    this.selectedRows = [];
   }
 }
 

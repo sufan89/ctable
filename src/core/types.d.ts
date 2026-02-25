@@ -20,17 +20,17 @@ declare namespace CTable {
     // 实际内容
     realVal: CTable.cellValueType;
     // 绘制单元格
-    renderCell: Function;
+    renderCell: () => void;
     // 计算单元格大小
-    calcCellSize: Function;
+    calcCellSize: () => void;
     // 列配置信息
     columnInfo: CTable.ColumnConfig;
     // 获取单元格大小，包括子所有子单元格大小
-    getCellSize: Function;
+    getCellSize: () => CTable.size;
     // 行高
     rowHeight: number;
     // 设置行高
-    setRowHeight: Function;
+    setRowHeight: (height: number) => void;
     // 表头大小
     headerSize: CTable.size;
     /*
@@ -90,11 +90,11 @@ declare namespace CTable {
   export type cellValueType =
     | string
     | number
-    | object
-    | []
+    | boolean
+    | { [key: string]: any }
+    | Array<any>
     | null
-    | undefined
-    | boolean;
+    | undefined;
   /*
    * checkBox值类型
    * */
@@ -117,7 +117,7 @@ declare namespace CTable {
     /*
      * 渲染行
      * */
-    renderRow: Function;
+    renderRow: (context?: CTable.ITable, x?: number) => void;
     /*
      * 行高
      * */
@@ -126,7 +126,7 @@ declare namespace CTable {
      * 行样式
      * */
     rowStyle: CTable.IRowStyle;
-    renderCell: Function;
+    renderCell: (cell: CTable.ICell) => void;
     /*
      * 获取当前行宽度
      * */
@@ -134,7 +134,10 @@ declare namespace CTable {
     /*
      * 计算当前行单元格尺寸
      * */
-    calcRowCellPosition: Function;
+    calcRowCellPosition: (
+      bbox: { x: number; y: number; width: number; height: number },
+      cells?: Array<CTable.ICell>
+    ) => void;
     /*
      * 是否鼠标选中
      * */
@@ -142,7 +145,6 @@ declare namespace CTable {
     /*
      * 设置当前行选中状态
      * */
-    // eslint-disable-next-line no-unused-vars
     setMouseSelect: (isSelect: boolean) => void;
     /*
      * 获取当前行数据

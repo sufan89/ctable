@@ -2,6 +2,7 @@
  * 处理表格事件
  * */
 import eventBus from "./event";
+import { debounce } from "../tools/debounce";
 
 class TableEventClass implements CTable.ITableEvent {
   /*
@@ -19,51 +20,66 @@ class TableEventClass implements CTable.ITableEvent {
    * 鼠标移动是选中的数据
    * */
   mouseOverData: CTable.MouseOverInfo;
+  /*
+   * 绑定的事件处理器，用于销毁时移除
+   * */
+  private boundHandlers: {
+    mousemove: (event: MouseEvent) => void;
+    mousedown: (event: MouseEvent) => void;
+    mouseup: (event: MouseEvent) => void;
+    wheel: (event: WheelEvent) => void;
+    mouseleave: (event: MouseEvent) => void;
+    mouseenter: (event: MouseEvent) => void;
+    click: (event: MouseEvent) => void;
+    keydown: (event: KeyboardEvent) => void;
+    keyup: (event: KeyboardEvent) => void;
+  };
 
   constructor(context: CTable.ITable) {
     this.ctx = context;
     this.eventObj = new eventBus();
     this.mouseCursor = "default";
+
+    // 创建带防抖的鼠标移动处理函数
+    const debouncedMouseMove = debounce(this.handleMouseMove.bind(this), 16); // 约60fps
+
+    // 创建绑定的事件处理器
+    this.boundHandlers = {
+      mousemove: (event: MouseEvent) => debouncedMouseMove(event),
+      mousedown: (event: MouseEvent) => this.onMousedown(event),
+      mouseup: (event: MouseEvent) => this.onMouseup(event),
+      wheel: (event: WheelEvent) => this.onWheel(event),
+      mouseleave: (event: MouseEvent) => this.onMouseLeave(event),
+      mouseenter: (event: MouseEvent) => this.onMouseenter(event),
+      click: (event: MouseEvent) => this.onClick(event),
+      keydown: (event: KeyboardEvent) => this.onKeydown(event),
+      keyup: (event: KeyboardEvent) => this.onKeyUp(event),
+    };
+
     const { tableElement } = context;
     if (tableElement) {
       // 鼠标移动事件
-      tableElement.addEventListener("mousemove", (event) => {
-        this.onMouseMove(event);
-      });
+      tableElement.addEventListener("mousemove", this.boundHandlers.mousemove);
       // 鼠标按下事件
-      tableElement.addEventListener("mousedown", (event) => {
-        this.onMousedown(event);
-      });
+      tableElement.addEventListener("mousedown", this.boundHandlers.mousedown);
       // 鼠标松开事件
-      tableElement.addEventListener("mouseup", (event) => {
-        this.onMouseup(event);
-      });
+      tableElement.addEventListener("mouseup", this.boundHandlers.mouseup);
       // 滚轮事件
-      tableElement.addEventListener("wheel", (event) => {
-        this.onWheel(event);
-      });
+      tableElement.addEventListener("wheel", this.boundHandlers.wheel);
       // 鼠标移出画布事件
-      tableElement.addEventListener("mouseleave", (event) => {
-        this.onMouseLeave(event);
-      });
+      tableElement.addEventListener("mouseleave", this.boundHandlers.mouseleave);
       // 鼠标移入画布事件
-      tableElement.addEventListener("mouseenter", (event) => {
-        this.onMouseenter(event);
-      });
+      tableElement.addEventListener("mouseenter", this.boundHandlers.mouseenter);
       // 鼠标点击事件
-      tableElement.addEventListener("click", (event) => this.onClick(event));
+      tableElement.addEventListener("click", this.boundHandlers.click);
       /*
        * 画布监听不了键盘事件，所以直接监听body的键盘事件
        * */
       if (window && window.document && window.document.body) {
         // 键盘按键按下事件
-        window.document.body.addEventListener("keydown", (event) => {
-          this.onKeydown(event);
-        });
+        window.document.body.addEventListener("keydown", this.boundHandlers.keydown);
         // 键盘按键松开事件
-        window.document.body.addEventListener("keyup", (event) => {
-          this.onKeyUp(event);
-        });
+        window.document.body.addEventListener("keyup", this.boundHandlers.keyup);
       }
     }
     this.mouseOverData = {
@@ -73,9 +89,80 @@ class TableEventClass implements CTable.ITableEvent {
     };
   }
 
+  /*
+   * 实际处理鼠标移动逻辑的函数
+   * */
+  private handleMouseMove(e: MouseEvent) {
+    const { movementX, movementY, offsetX, offsetY } = e;
+    // 往上、往右是负数
+    if (this.mouseCursor === "grabbing") {
+      // 拖动画布
+      this.dragCanvas(movementX, movementY);
+    } else if (this.isMouseIn) {
+      // 计算当前鼠标移动位置在哪行数据，哪个单元格
+      this.mouseOverData = this.getMousePointInfo(offsetX, offsetY);
+      // 先将所有当前绘制的数据，置为false
+      this.ctx.viewRows.forEach((row) => {
+        row.setMouseSelect(false);
+      });
+      // 高亮当前鼠标移动选中数据
+      if (!this.mouseOverData.isHeader) {
+        this.mouseOverData.currentRow?.setMouseSelect(true);
+      }
+      // 处理CheckBox交互
+      const { currentCell } = this.mouseOverData;
+      if (currentCell) {
+        if (currentCell.cellType === "checkbox") {
+          // 计算当前鼠标位置是否在勾选框内
+          if (currentCell.isPointInContent(offsetX, offsetY)) {
+            currentCell.isContentSelect = true;
+            if (currentCell.disabled) {
+              this.mouseCursor = "not-allowed";
+            } else {
+              // 改变鼠标状态
+              this.mouseCursor = "pointer";
+            }
+          } else {
+            currentCell.isContentSelect = false;
+            this.mouseCursor = "default";
+          }
+          const { tableElement } = this.ctx;
+          if (tableElement) {
+            tableElement.style.cursor = this.mouseCursor;
+          }
+        }
+      }
+      this.ctx.reRender();
+    }
+    // todo 拖动表头宽度
+    // todo 拖动表头进行排序
+  }
+
+  /**
+   * 销毁事件监听器，防止内存泄漏
+   */
+  destroy(): void {
+    const { tableElement } = this.ctx;
+    if (tableElement) {
+      tableElement.removeEventListener("mousemove", this.boundHandlers.mousemove);
+      tableElement.removeEventListener("mousedown", this.boundHandlers.mousedown);
+      tableElement.removeEventListener("mouseup", this.boundHandlers.mouseup);
+      tableElement.removeEventListener("wheel", this.boundHandlers.wheel);
+      tableElement.removeEventListener("mouseleave", this.boundHandlers.mouseleave);
+      tableElement.removeEventListener("mouseenter", this.boundHandlers.mouseenter);
+      tableElement.removeEventListener("click", this.boundHandlers.click);
+    }
+    if (window && window.document && window.document.body) {
+      window.document.body.removeEventListener("keydown", this.boundHandlers.keydown);
+      window.document.body.removeEventListener("keyup", this.boundHandlers.keyup);
+    }
+    // 清除所有订阅的事件
+    this.eventObj.clearEvent("");
+  }
+
   on(
     eventName: string,
-    callBack: Function,
+    callBack: (...args: any[]) => void,
     callOnce: boolean | undefined
   ): void {
     if (callOnce) {
@@ -93,6 +180,8 @@ class TableEventClass implements CTable.ITableEvent {
    * 处理滚轮事件
    * */
   onWheel(event: WheelEvent) {
+    event.preventDefault(); // 阻止默认滚动行为
+
     const { shiftKey, deltaY } = event;
     const { scrollTop, scrollLeft } = this.ctx.offsetInfo;
     const { width, height } = this.ctx.viewSize;
@@ -167,54 +256,6 @@ class TableEventClass implements CTable.ITableEvent {
     this.changeMousePoint("default");
   }
 
-  /*
-   * 鼠标移动事件
-   * */
-  onMouseMove(e: MouseEvent) {
-    const { movementX, movementY, offsetX, offsetY } = e;
-    // 往上、往右是负数
-    if (this.mouseCursor === "grabbing") {
-      // 拖动画布
-      this.dragCanvas(movementX, movementY);
-    } else if (this.isMouseIn) {
-      // 计算当前鼠标移动位置在哪行数据，哪个单元格
-      this.mouseOverData = this.getMousePointInfo(offsetX, offsetY);
-      // 先将所有当前绘制的数据，置为false
-      this.ctx.viewRows.forEach((row) => {
-        row.setMouseSelect(false);
-      });
-      // 高亮当前鼠标移动选中数据
-      if (!this.mouseOverData.isHeader) {
-        this.mouseOverData.currentRow?.setMouseSelect(true);
-      }
-      // 处理CheckBox交互
-      const { currentCell } = this.mouseOverData;
-      if (currentCell) {
-        if (currentCell.cellType === "checkbox") {
-          // 计算当前鼠标位置是否在勾选框内
-          if (currentCell.isPointInContent(offsetX, offsetY)) {
-            currentCell.isContentSelect = true;
-            if (currentCell.disabled) {
-              this.mouseCursor = "not-allowed";
-            } else {
-              // 改变鼠标状态
-              this.mouseCursor = "pointer";
-            }
-          } else {
-            currentCell.isContentSelect = false;
-            this.mouseCursor = "default";
-          }
-          const { tableElement } = this.ctx;
-          if (tableElement) {
-            tableElement.style.cursor = this.mouseCursor;
-          }
-        }
-      }
-      this.ctx.reRender();
-    }
-    // todo 拖动表头宽度
-    // todo 拖动表头进行排序
-  }
 
   /*
    * 改变鼠标指针状态
