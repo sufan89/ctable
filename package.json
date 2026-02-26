@@ -22,6 +22,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
+    "example": "vite",
     "test": "cd .. && jest --config ctable/test/jest.config.cjs",
     "test:unit": "cd .. && jest --config ctable/test/jest.config.cjs --testPathPattern=ctable/test/unit",
     "test:integration": "cd .. && jest --config ctable/test/jest.config.cjs --testPathPattern=ctable/test/integration",

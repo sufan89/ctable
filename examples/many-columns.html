@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTable Many Columns Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    #table-container {
+      overflow: hidden;
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+
+    .controls {
+      margin: 15px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #f5f5f5;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e3f2fd;
+      border-radius: 4px;
+      border: 1px solid #2196f3;
+    }
+
+    .nav {
+      margin-bottom: 20px;
+    }
+
+    .nav a {
+      margin-right: 15px;
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html">Basic</a>
+    <a href="checkbox.html">Checkbox</a>
+    <a href="multilevel.html">Multi-level Header</a>
+    <a href="large-data.html">Large Data</a>
+    <a href="style.html">Style</a>
+    <a href="many-columns.html">Many Columns</a>
+  </div>
+
+  <h1>CTable Many Columns Example</h1>
+
+  <div class="description">
+    <p>This example tests horizontal scrolling with many columns (50+ columns). Use Shift + Mouse Wheel or the horizontal scrollbar to scroll.</p>
+  </div>
+
+  <div class="controls">
+    <button onclick="loadData(10)">10 Columns</button>
+    <button onclick="loadData(30)">30 Columns</button>
+    <button onclick="loadData(50)">50 Columns</button>
+    <button onclick="loadData(100)">100 Columns</button>
+  </div>
+
+  <div id="table-container"></div>
+
+  <div class="status" id="status">Click a button to load data</div>
+
+  <script type="module">
+    import CTable from '../src/ctable.ts';
+
+    let tableInstance = null;
+
+    function generateColumns(count) {
+      const columns = [];
+      for (let i = 0; i < count; i++) {
+        columns.push({
+          prop: `col${i}`,
+          label: `Column ${i + 1}`,
+          width: 120
+        });
+      }
+      return columns;
+    }
+
+    function generateData(count, colCount) {
+      const data = [];
+      for (let i = 0; i < count; i++) {
+        const row = { id: i + 1 };
+        for (let j = 0; j < colCount; j++) {
+          row[`col${j}`] = `Data-${i + 1}-${j + 1}`;
+        }
+        data.push(row);
+      }
+      return data;
+    }
+
+    function loadData(colCount) {
+      const startTime = performance.now();
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = `Generating table with ${colCount} columns...`;
+
+      setTimeout(() => {
+        // Clear previous instance
+        if (tableInstance) {
+          tableInstance.destroy();
+        }
+
+        // Clear container
+        const container = document.getElementById('table-container');
+        container.innerHTML = '';
+
+        const columns = generateColumns(colCount);
+        const data = generateData(100, colCount);
+
+        const tableConfig = {
+          Columns: columns,
+          rowStyle: { height: 35 },
+          headRowStyle: { backgroundColor: '#4a90e2', height: 40 },
+          headCellStyle: {
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          },
+          wheelSpeed: 0.8
+        };
+
+        tableInstance = new CTable('table-container', tableConfig);
+        tableInstance.setTableData(data);
+
+        const endTime = performance.now();
+        statusEl.textContent = `Loaded table with ${colCount} columns and 100 rows in ${(endTime - startTime).toFixed(2)}ms`;
+      }, 50);
+    }
+
+    // Expose to window for buttons
+    window.loadData = loadData;
+
+    // Initial load
+    loadData(10);
+
+    // Add scroll info listener
+    if (tableInstance) {
+      tableInstance.on('Scroll', (scrollInfo) => {
+        console.log('Scroll info:', scrollInfo);
+      });
+    }
+  </script>
+</body>
+</html>

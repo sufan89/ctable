@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTable Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    #table-container {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+    }
+
+    button {
+      margin-right: 10px;
+      padding: 8px 16px;
+    }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>CTable Example</h1>
+
+  <div class="controls">
+    <button onclick="addRow()">Add Row</button>
+    <button onclick="removeSelected()">Remove Selected</button>
+    <button onclick="logSelections()">Log Selections</button>
+    <button onclick="generateLargeDataset()">Load Large Dataset (10K rows)</button>
+  </div>
+
+  <div id="table-container"></div>
+
+  <div class="status" id="status">Ready</div>
+
+  <script type="module">
+    // In a real application, you would import from the installed package:
+    // import CTable from '@sufan_89/ctable';
+
+    // For this example, we're assuming the built version is available
+    // In practice, after building with 'npm run build', you'd use the generated files
+
+    // Since we can't directly import the unbuilt version in a browser without a bundler,
+    // this example shows the API usage for reference.
+
+    // Below is pseudocode showing how the API would be used after building:
+
+    /*
+    const tableConfig = {
+      Columns: [
+        {
+          prop: 'selection',
+          label: 'Select',
+          cellType: 'checkbox',
+          width: 50
+        },
+        {
+          prop: 'id',
+          label: 'ID',
+          width: 80,
+          align: 'center'
+        },
+        {
+          prop: 'name',
+          label: 'Name',
+          width: 150
+        },
+        {
+          prop: 'email',
+          label: 'Email',
+          width: 200
+        },
+        {
+          prop: 'role',
+          label: 'Role',
+          width: 120
+        },
+        {
+          prop: 'department',
+          label: 'Department',
+          width: 150
+        }
+      ],
+      rowStyle: {
+        height: 35
+      },
+      headRowStyle: {
+        backgroundColor: '#4a90e2',
+        height: 40
+      },
+      headCellStyle: {
+        color: '#fff',
+        fontSize: '14px',
+        fontWeight: 'bold'
+      },
+      showBorder: true,
+      wheelSpeed: 0.8
+    };
+
+    const table = new CTable('table-container', tableConfig);
+
+    // Sample data
+    const sampleData = [
+      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Developer', department: 'Engineering' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Designer', department: 'Design' },
+      { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Manager', department: 'Management' },
+      { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'Analyst', department: 'Finance' },
+      { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Tester', department: 'QA' }
+    ];
+
+    table.setTableData(sampleData);
+
+    // Event handlers
+    table.on('RowClick', (rowData) => {
+      document.getElementById('status').innerText = `Row clicked: ${rowData.name}`;
+    });
+
+    table.on('SelectionChange', (prop, selectedRows, currentRow) => {
+      document.getElementById('status').innerText =
+        `Selection changed: ${selectedRows.length} rows selected`;
+    });
+
+    // Button handlers
+    let counter = 6;
+
+    function addRow() {
+      const newRow = {
+        id: counter++,
+        name: `New User ${counter-1}`,
+        email: `user${counter-1}@example.com`,
+        role: 'Employee',
+        department: 'General'
+      };
+
+      // In a real implementation, you would add to the data array and refresh
+      const currentData = [...sampleData, newRow];
+      table.setTableData(currentData);
+      document.getElementById('status').innerText = `Added new row with ID: ${newRow.id}`;
+    }
+
+    function removeSelected() {
+      // Implementation would depend on how selections are tracked
+      document.getElementById('status').innerText = 'Selected rows removed';
+    }
+
+    function logSelections() {
+      document.getElementById('status').innerText = 'Selections logged to console';
+      console.log('Selected rows:', table.selectedRows);
+    }
+
+    function generateLargeDataset() {
+      const largeData = [];
+      for (let i = 0; i < 10000; i++) {
+        largeData.push({
+          id: i + 1,
+          name: `User ${i + 1}`,
+          email: `user${i + 1}@example.com`,
+          role: ['Developer', 'Designer', 'Manager', 'Analyst', 'Tester'][i % 5],
+          department: ['Engineering', 'Design', 'Management', 'Finance', 'QA', 'HR', 'Marketing'][i % 7]
+        });
+      }
+
+      table.setTableData(largeData);
+      document.getElementById('status').innerText = 'Loaded large dataset with 10,000 rows';
+    }
+    */
+
+    // Placeholder implementation for demonstration
+    document.getElementById('status').innerText =
+      'CTable example loaded. In a real implementation after building, this would render a canvas-based table.';
+  </script>
+</body>
+</html>

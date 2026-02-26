@@ -66,7 +66,7 @@ class verticalScrollClass implements CTable.IBar {
     this.scrollSize = val;
   }
 
-  setBarSize(val: number): void {
+  setBarSize(_val: number): void {
   }
   /*
    * 初始化事件

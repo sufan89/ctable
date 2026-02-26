@@ -3,14 +3,17 @@ class rowClass implements CTable.IRow {
   rowHeight: number;
   rowStyle: CTable.IRowStyle;
   isMouseSelect: boolean;
+  protected ctx: CanvasRenderingContext2D;
+
   constructor(ctx: CanvasRenderingContext2D, rowStyle: CTable.IRowStyle) {
+    this.ctx = ctx;
     this.rowHeight = 0;
     this.rowCells = [];
     this.rowStyle = rowStyle;
     this.isMouseSelect = false;
   }
   // eslint-disable-next-line no-unused-vars
-  renderRow(context: CTable.ITable) {
+  renderRow(context?: CTable.ITable, x?: number) {
   }
   /*
    * 计算表头各个单元格大小，并根据大小确定绘制位置
@@ -36,20 +39,21 @@ class rowClass implements CTable.IRow {
    * */
   public calcRowCellPosition(
     bbox: { x: number; y: number; width: number; height: number },
-    cells: Array<CTable.ICell>
+    cells?: Array<CTable.ICell>
   ) {
+    const actualCells = cells || this.rowCells;
     let { x, y, width } = bbox;
-    if (cells && cells.length > 0) {
+    if (actualCells && actualCells.length > 0) {
       // 右固定列信息
-      const rightCells: Array<CTable.ICell> = cells.filter(
+      const rightCells: Array<CTable.ICell> = actualCells.filter(
         (c) => c.columnInfo.fixed && c.columnInfo.fixed === "right"
       );
       // 左固定列信息
-      const leftCells: Array<CTable.ICell> = cells.filter(
+      const leftCells: Array<CTable.ICell> = actualCells.filter(
         (c) => c.columnInfo.fixed && c.columnInfo.fixed === "left"
       );
       // 不固定列信息
-      const unFixedCells: Array<CTable.ICell> = cells.filter(
+      const unFixedCells: Array<CTable.ICell> = actualCells.filter(
         (c) => c.columnInfo.fixed === undefined
       );
       let leftPosition: number = 0;

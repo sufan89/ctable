@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTable Multi-level Header Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    #table-container {
+      overflow: hidden;
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+    }
+
+    .code-block {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    pre {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .nav {
+      margin-bottom: 20px;
+    }
+
+    .nav a {
+      margin-right: 15px;
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html">Basic</a>
+    <a href="checkbox.html">Checkbox</a>
+    <a href="multilevel.html">Multi-level Header</a>
+    <a href="large-data.html">Large Data</a>
+    <a href="style.html">Style</a>
+  </div>
+
+  <h1>CTable Multi-level Header Example</h1>
+
+  <div class="description">
+    <p>This example demonstrates how to create multi-level (nested) headers using the children property.</p>
+  </div>
+
+  <div id="table-container"></div>
+
+  <div class="code-block">
+    <pre>
+// Multi-level header configuration
+const tableConfig = {
+  Columns: [
+    {
+      prop: 'user',
+      label: 'User Info',
+      children: [
+        { prop: 'name', label: 'Name', width: 120 },
+        { prop: 'age', label: 'Age', width: 80 }
+      ]
+    },
+    {
+      prop: 'contact',
+      label: 'Contact',
+      children: [
+        { prop: 'phone', label: 'Phone', width: 150 },
+        { prop: 'email', label: 'Email', width: 200 }
+      ]
+    },
+    {
+      prop: 'work',
+      label: 'Work Info',
+      children: [
+        { prop: 'department', label: 'Department', width: 120 },
+        { prop: 'position', label: 'Position', width: 120 }
+      ]
+    }
+  ],
+  headRowStyle: { backgroundColor: '#4a90e2', height: 50 }
+};
+    </pre>
+  </div>
+
+  <script type="module">
+    import CTable from '../src/ctable.ts';
+
+    const tableConfig = {
+      Columns: [
+        {
+          prop: 'user',
+          label: 'User Info',
+          children: [
+            { prop: 'name', label: 'Name', width: 120 },
+            { prop: 'age', label: 'Age', width: 80, align: 'center' }
+          ]
+        },
+        {
+          prop: 'contact',
+          label: 'Contact',
+          children: [
+            { prop: 'phone', label: 'Phone', width: 150 },
+            { prop: 'email', label: 'Email', width: 200 }
+          ]
+        },
+        {
+          prop: 'work',
+          label: 'Work Info',
+          children: [
+            { prop: 'department', label: 'Department', width: 120 },
+            { prop: 'position', label: 'Position', width: 120 }
+          ]
+        }
+      ],
+      rowStyle: { height: 35 },
+      headRowStyle: { backgroundColor: '#4a90e2', height: 50 },
+      headCellStyle: {
+        color: '#fff',
+        fontSize: '14px',
+        fontWeight: 'bold'
+      }
+    };
+
+    const tableData = [
+      { name: 'John Doe', age: 30, phone: '555-0101', email: 'john@example.com', department: 'Engineering', position: 'Senior Developer' },
+      { name: 'Jane Smith', age: 28, phone: '555-0102', email: 'jane@example.com', department: 'Design', position: 'UI Designer' },
+      { name: 'Bob Johnson', age: 35, phone: '555-0103', email: 'bob@example.com', department: 'Management', position: 'Team Lead' },
+      { name: 'Alice Williams', age: 32, phone: '555-0104', email: 'alice@example.com', department: 'Finance', position: 'Analyst' },
+      { name: 'Charlie Brown', age: 27, phone: '555-0105', email: 'charlie@example.com', department: 'QA', position: 'Tester' },
+      { name: 'David Wilson', age: 31, phone: '555-0106', email: 'david@example.com', department: 'Engineering', position: 'Developer' },
+      { name: 'Emma Davis', age: 29, phone: '555-0107', email: 'emma@example.com', department: 'Marketing', position: 'Manager' },
+      { name: 'Frank Miller', age: 33, phone: '555-0108', email: 'frank@example.com', department: 'Sales', position: 'Representative' },
+      { name: 'Grace Lee', age: 26, phone: '555-0109', email: 'grace@example.com', department: 'HR', position: 'Recruiter' },
+      { name: 'Henry Taylor', age: 34, phone: '555-0110', email: 'henry@example.com', department: 'Operations', position: 'Coordinator' }
+    ];
+
+    const table = new CTable('table-container', tableConfig);
+    table.setTableData(tableData);
+
+    // Add cell click event
+    table.on('CellClick', (rowData, column, cellValue, rowIndex) => {
+      console.log('Clicked:', column.prop, '=', cellValue);
+    });
+  </script>
+</body>
+</html>

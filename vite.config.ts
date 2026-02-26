@@ -1,15 +1,23 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  root: 'examples',
+  publicDir: '../public',
+  server: {
+    port: 3000,
+    open: true
+  },
   build: {
+    outDir: '../dist',
+    emptyOutDir: true,
     lib: {
       entry: './lib/main.ts',
       name: 'CTable',
       fileName: 'ctable',
-      formats:["umd","es"]
+      formats: ['umd', 'es']
     },
-    target:"modules",
-    minify:true,
-    sourcemap:false,
-  },
+    target: 'modules',
+    minify: true,
+    sourcemap: false
+  }
 })

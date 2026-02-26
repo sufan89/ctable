@@ -64,8 +64,8 @@ class TableEventClass implements CTable.ITableEvent {
       tableElement.addEventListener("mousedown", this.boundHandlers.mousedown);
       // 鼠标松开事件
       tableElement.addEventListener("mouseup", this.boundHandlers.mouseup);
-      // 滚轮事件
-      tableElement.addEventListener("wheel", this.boundHandlers.wheel);
+      // 滚轮事件 - 需要设置 passive: false 以允许阻止默认行为
+      tableElement.addEventListener("wheel", this.boundHandlers.wheel, { passive: false });
       // 鼠标移出画布事件
       tableElement.addEventListener("mouseleave", this.boundHandlers.mouseleave);
       // 鼠标移入画布事件
@@ -237,7 +237,7 @@ class TableEventClass implements CTable.ITableEvent {
   /*
    * 鼠标移入事件
    * */
-  onMouseenter(e: MouseEvent) {
+  onMouseenter(_e: MouseEvent) {
     this.isMouseIn = true;
     this.changeMousePoint(this.mouseCursor);
   }
@@ -245,7 +245,7 @@ class TableEventClass implements CTable.ITableEvent {
   /*
    * 鼠标移出事件
    * */
-  onMouseLeave(e: MouseEvent) {
+  onMouseLeave(_e: MouseEvent) {
     this.isMouseIn = false;
     // 鼠标移出之后，需要清空鼠标移动选中数据
     this.mouseOverData = {
@@ -288,7 +288,7 @@ class TableEventClass implements CTable.ITableEvent {
   /*
    * 处理鼠标按键松开事件
    * */
-  onMouseup(e: MouseEvent) {
+  onMouseup(_e: MouseEvent) {
     if (this.isMouseIn && this.pressKeyCode === "Space") {
       this.mouseCursor = "grab";
       this.changeMousePoint(this.mouseCursor);
@@ -370,7 +370,7 @@ class TableEventClass implements CTable.ITableEvent {
   /*
    * 鼠标点击事件
    * */
-  onClick(event: MouseEvent) {
+  onClick(_event: MouseEvent) {
     const { currentRow, currentCell, isHeader } = this.mouseOverData;
     // 当前鼠标指针未选中任何数据，直接跳过，不进行事件处理
     if (!currentRow || !currentCell) {

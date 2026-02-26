@@ -131,8 +131,8 @@ class scrollBarClass implements CTable.IScrollBar {
    *设置滚动显示隐藏
    * */
   showScrollBar(
-    showVerticalBar: boolean = true,
-    showHorizontalBar: boolean = true
+    _showVerticalBar: boolean = true,
+    _showHorizontalBar: boolean = true
   ) {
   }
 

@@ -11,10 +11,6 @@ class tableHeader extends rowClass {
    * */
   rowCells: Array<CTable.ICell>;
   /*
-   * 当前canvas上下文
-   * */
-  private ctx: CanvasRenderingContext2D;
-  /*
    * 当前表格表头配置
    * */
   private headerConfigInfo: Array<CTable.ColumnConfig>;
@@ -35,7 +31,6 @@ class tableHeader extends rowClass {
     rowStyle: CTable.IRowStyle
   ) {
     super(ctx, rowStyle);
-    this.ctx = ctx;
     this.headerConfigInfo = headerConfig;
     this.rowCells = new Array<CTable.ICell>();
     this.rowHeight = 0;
@@ -102,7 +97,17 @@ class tableHeader extends rowClass {
   /*
    * 表头渲染
    * */
-  public renderRow(context: CTable.ITable, x: number = 0) {
+  public renderRow(context?: CTable.ITable, x: number = 0) {
+    if (!context) {
+      // If no context provided, just render cells with default positioning
+      if (this.rowCells && this.rowCells.length > 0) {
+        this.rowCells.forEach((cell) => {
+          this.renderCell(cell);
+        });
+      }
+      return;
+    }
+
     // 计算行中每个单元格的位置
     this.calcRowCellPosition(
       {

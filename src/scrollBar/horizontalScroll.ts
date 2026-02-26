@@ -71,7 +71,7 @@ class horizontalScrollClass implements CTable.IBar {
     this.scrollSize = val;
   }
 
-  setBarSize(val: number): void {
+  setBarSize(_val: number): void {
   }
 
   setBarStyle(style: { [key: string]: string | number }): void {

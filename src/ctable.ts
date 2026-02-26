@@ -148,9 +148,19 @@ class tableClass implements CTable.ITable {
    * 根据配置进行初始化
    */
   private init() {
-    this.tableHeader.renderRow(this);
-    // 平铺表格列信息
+    // 先扁平化表格列信息，确保表头和表体使用相同的列顺序
     this.flatTableColumns(this.tableHeader.rowCells);
+    // 使用扁平化后的列重新计算表头单元格位置，使其与表体对齐
+    this.tableHeader.calcRowCellPosition(
+      {
+        x: 0,
+        y: 0,
+        width: this.viewSize.width,
+        height: this.viewSize.height,
+      },
+      this.tableColumns
+    );
+    this.tableHeader.renderRow(this, 0);
     // 根据列，初始化选择行信息
     this.tableColumns
       .filter((t) => t.columnInfo.cellType === "checkbox")
@@ -162,10 +172,10 @@ class tableClass implements CTable.ITable {
       height: 0,
       width: this.tableHeader.getRowWidth(),
     });
-    // 重新设置可视区域大小
+    // 重新设置可视区域大小，使用 viewSize（CSS大小）而不是实际像素大小
     this.tableScrollBar.setViewSize({
-      width: this.tableElement?.width || 0,
-      height: this.tableElement?.height ? this.tableElement.height - this.tableHeader.rowHeight : 0,
+      width: this.viewSize.width,
+      height: this.viewSize.height ? this.viewSize.height - this.tableHeader.rowHeight : 0,
     });
   }
   /*
@@ -174,11 +184,27 @@ class tableClass implements CTable.ITable {
   private changeCanvasSize() {
     const boundRect = this.parentElement?.getBoundingClientRect();
     if (this.tableElement) {
-      this.tableElement.width = boundRect ? boundRect.width : 200;
-      this.tableElement.height = boundRect ? boundRect.height : 200;
+      // 获取设备像素比，解决模糊问题
+      const dpr = window.devicePixelRatio || 1;
+      const width = boundRect ? boundRect.width : 200;
+      const height = boundRect ? boundRect.height : 200;
+
+      // 设置 canvas 的实际像素大小（考虑 dpr）
+      this.tableElement.width = width * dpr;
+      this.tableElement.height = height * dpr;
+
+      // 通过 CSS 控制显示大小
+      this.tableElement.style.width = `${width}px`;
+      this.tableElement.style.height = `${height}px`;
+
+      // 缩放 context 以匹配 dpr
+      if (this.ctx) {
+        this.ctx.scale(dpr, dpr);
+      }
+
       this.viewSize = {
-        width: this.tableElement.width,
-        height: this.tableElement.height,
+        width: width,
+        height: height,
       };
       this.tableScrollBar.setViewSize(this.viewSize);
     }
@@ -191,6 +217,16 @@ class tableClass implements CTable.ITable {
       this.viewRows.forEach((r) => {
         r.renderRow();
       });
+      // 使用扁平化后的列确保与表体对齐
+      this.tableHeader.calcRowCellPosition(
+        {
+          x: -this.offsetInfo.scrollLeft,
+          y: 0,
+          width: this.viewSize.width,
+          height: this.viewSize.height,
+        },
+        this.tableColumns
+      );
       this.tableHeader.renderRow(this, -this.offsetInfo.scrollLeft);
     } else {
       this.offsetRender(this.offsetInfo);
@@ -303,7 +339,16 @@ class tableClass implements CTable.ITable {
         break;
       }
     }
-    // 最后绘制表头
+    // 最后绘制表头 - 使用扁平化后的列确保与表体对齐
+    this.tableHeader.calcRowCellPosition(
+      {
+        x: -scrollLeft,
+        y: 0,
+        width: this.viewSize.width,
+        height: this.viewSize.height,
+      },
+      this.tableColumns
+    );
     this.tableHeader.renderRow(this, -scrollLeft);
   }
   /*

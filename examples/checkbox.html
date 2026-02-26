@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTable Checkbox Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    #table-container {
+      overflow: hidden;
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+    }
+
+    .controls {
+      margin: 15px 0;
+    }
+
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #f5f5f5;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e8f5e9;
+      border-radius: 4px;
+      border: 1px solid #4caf50;
+    }
+
+    .code-block {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    pre {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .nav {
+      margin-bottom: 20px;
+    }
+
+    .nav a {
+      margin-right: 15px;
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html">Basic</a>
+    <a href="checkbox.html">Checkbox</a>
+    <a href="multilevel.html">Multi-level Header</a>
+    <a href="large-data.html">Large Data</a>
+    <a href="style.html">Style</a>
+  </div>
+
+  <h1>CTable Checkbox Example</h1>
+
+  <div class="description">
+    <p>This example demonstrates how to use checkbox cells for row selection, including select all functionality.</p>
+  </div>
+
+  <div class="controls">
+    <button onclick="getSelectedRows()">Get Selected Rows</button>
+    <button onclick="clearSelection()">Clear Selection</button>
+    <button onclick="selectAll()">Select All</button>
+  </div>
+
+  <div id="table-container"></div>
+
+  <div class="status" id="status">No rows selected</div>
+
+  <script type="module">
+    import CTable from '../src/ctable.ts';
+
+    let tableInstance = null;
+
+    const tableConfig = {
+      Columns: [
+        {
+          prop: 'selection',
+          label: 'Select',
+          cellType: 'checkbox',
+          width: 50
+        },
+        { prop: 'id', label: 'ID', width: 80, align: 'center' },
+        { prop: 'name', label: 'Name', width: 150 },
+        { prop: 'email', label: 'Email', width: 200 },
+        { prop: 'role', label: 'Role', width: 120 }
+      ],
+      rowStyle: { height: 35 },
+      headRowStyle: { backgroundColor: '#4a90e2', height: 40 },
+      headCellStyle: {
+        color: '#fff',
+        fontSize: '14px',
+        fontWeight: 'bold'
+      },
+      checkBoxConfig: {
+        size: 16,
+        backGround: '#fff',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        disabledColor: '#f5f5f5',
+        disabledCheckedColor: '#999'
+      }
+    };
+
+    const tableData = [
+      { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Developer' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Designer' },
+      { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Manager' },
+      { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'Analyst' },
+      { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'Tester' },
+      { id: 6, name: 'David Wilson', email: 'david@example.com', role: 'Developer' },
+      { id: 7, name: 'Emma Davis', email: 'emma@example.com', role: 'Designer' },
+      { id: 8, name: 'Frank Miller', email: 'frank@example.com', role: 'Manager' },
+      { id: 9, name: 'Grace Lee', email: 'grace@example.com', role: 'Analyst' },
+      { id: 10, name: 'Henry Taylor', email: 'henry@example.com', role: 'Tester' }
+    ];
+
+    tableInstance = new CTable('table-container', tableConfig);
+    tableInstance.setTableData(tableData);
+
+    // Listen for selection changes
+    tableInstance.on('SelectionChange', (prop, selectedRows, currentRow) => {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = `${selectedRows.length} row(s) selected`;
+      console.log('Selection changed:', selectedRows);
+    });
+
+    // Listen for select all
+    tableInstance.on('SelectAll', (prop, selectedRows) => {
+      console.log('All rows selected:', selectedRows);
+    });
+
+    // Expose functions to global scope for buttons
+    window.getSelectedRows = function() {
+      const statusEl = document.getElementById('status');
+      const selectedInfo = tableInstance.selectedRows.find(t => t.colKey === 'selection');
+      if (selectedInfo && selectedInfo.rows.length > 0) {
+        const selectedData = selectedInfo.rows.map(r => r.getRowData());
+        console.log('Selected rows:', selectedData);
+        statusEl.textContent = `Selected ${selectedData.length} row(s): ${selectedData.map(d => d.name).join(', ')}`;
+      } else {
+        statusEl.textContent = 'No rows selected';
+      }
+    };
+
+    window.clearSelection = function() {
+      // Get the header checkbox cell and trigger uncheck
+      const headCheckCell = tableInstance.tableColumns.find(t => t.columnInfo.prop === 'selection');
+      if (headCheckCell) {
+        headCheckCell.setCellValue({ checked: false, indeterminate: false });
+        // Update all row checkboxes
+        tableInstance.tableBody.forEach(r => {
+          const cell = r.rowCells.find(c => c.columnInfo.prop === 'selection');
+          if (cell) {
+            cell.setCellValue({ checked: false, indeterminate: false });
+          }
+        });
+        // Clear selection
+        const selectedInfo = tableInstance.selectedRows.find(t => t.colKey === 'selection');
+        if (selectedInfo) {
+          selectedInfo.rows = [];
+        }
+        tableInstance.reRender();
+        document.getElementById('status').textContent = 'Selection cleared';
+      }
+    };
+
+    window.selectAll = function() {
+      // Trigger select all
+      const headCheckCell = tableInstance.tableColumns.find(t => t.columnInfo.prop === 'selection');
+      if (headCheckCell) {
+        tableInstance.headCheckBoxChange(headCheckCell);
+      }
+    };
+  </script>
+</body>
+</html>
